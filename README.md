@@ -64,7 +64,7 @@ Photos come from Unsplash or Pexels, are hotlinked from their CDNs, served at re
 sizes with `srcset`, lazy-loaded below the fold, and credited in every caption and on
 `/credits/`.
 
-**Rule:** only add a photo when the location field on its Unsplash page names the place
+**Rule:** only add a photo when the location on its Unsplash or Pexels page names the place
 it is used for. Copy that text into `location`; it is shown in the caption.
 A slot without a photo shows a drawn granite-and-sea illustration rather than a photo of
 somewhere else. See `FACTS-TO-VERIFY.md` for the empty slots.
