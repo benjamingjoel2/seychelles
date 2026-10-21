@@ -1,15 +1,18 @@
 /**
- * Unsplash photos, keyed by the slot they illustrate.
+ * Photos from Unsplash (P) and Pexels (X), keyed by the slot they illustrate.
  *
- * RULE: a photo is only added when the "location" field on its Unsplash page names
- * the place it is used for. `location_on_unsplash` records that text verbatim and is
- * shown in the caption. Slots with no entry render an illustration instead.
- * Hotlinked from images.unsplash.com, as Unsplash's guidelines ask; credited in the
- * caption and on /credits/.
+ * RULE: a photo is only added when the location shown on its own Unsplash/Pexels page
+ * names the place it is used for. `location` records that text verbatim and is shown in
+ * the caption. Slots with no entry render an illustration instead.
+ * Images are hotlinked from the source's CDN and credited in the caption and on /credits/.
  */
-const P = (slot, id, page, img, photographer, handle, location_on_unsplash, alt) => ({
-  slot, id, page, img: `https://images.unsplash.com/${img}`, photographer,
-  photographer_url: `https://unsplash.com/@${handle}`, location_on_unsplash, alt,
+const P = (slot, id, page, img, photographer, handle, location, alt) => ({
+  source: 'unsplash', slot, id, page, img: `https://images.unsplash.com/${img}`, photographer,
+  photographer_url: `https://unsplash.com/@${handle}`, location, alt,
+});
+// Pexels photos: pass full URLs. `img` is the images.pexels.com URL without a query string.
+const X = (slot, id, page, img, photographer, photographer_url, location, alt) => ({
+  source: 'pexels', slot, id, page, img, photographer, photographer_url, location, alt,
 });
 
 const list = [

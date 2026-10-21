@@ -99,5 +99,5 @@ Also check:
 
 ## Photos
 
-- [ ] Each photo in `src/data/photos.js` was accepted because its Unsplash location field names the place it illustrates (recorded verbatim in `location_on_unsplash`). Re-check occasionally that the photos are still online and the locations unchanged.
+- [ ] Each photo in `src/data/photos.js` was accepted because its location on its Unsplash or Pexels page names the place it illustrates (recorded verbatim in `location`). Re-check occasionally that the photos are still online and the locations unchanged.
 - [ ] Slots still without a matching photo, which show an illustration instead: Silhouette, Curieuse, Bird Island, Denis, Aldabra, birds, reefs, Anse Takamaka, Port Launay, Côte d’Or, Grand Anse (Praslin), Grand Anse (La Digue), Anse Cocos, Anse Sévère.

@@ -9,6 +9,10 @@ const html = (strings, ...vals) =>
 
 const utm = `utm_source=${encodeURIComponent(config.brand.name.toLowerCase().replace(/\s+/g, '_'))}&utm_medium=referral`;
 
+const SOURCE = { unsplash: 'Unsplash', pexels: 'Pexels' };
+// Unsplash asks for referral parameters on credit links; Pexels links are left clean.
+const creditUrl = (p, url) => (p.source === 'unsplash' ? `${url}?${utm}` : url);
+
 /** Every photo used on the site, collected for the credits page. */
 const used = new Map();
 
@@ -26,13 +30,16 @@ function photo(slot, { index = 0, ratio = '3:2', sizes = '100vw', eager = false,
     </figure>`;
   }
   used.set(p.id, { ...p, slot });
-  const src = (w) => `${p.img}?auto=format&fit=crop&w=${w}&ar=${rw}:${rh}&q=70`;
+  const src = (w) =>
+    p.source === 'pexels'
+      ? `${p.img}?auto=compress&cs=tinysrgb&fit=crop&w=${w}&h=${Math.round((w * rh) / rw)}`
+      : `${p.img}?auto=format&fit=crop&w=${w}&ar=${rw}:${rh}&q=70`;
   const widths = [480, 800, 1200, 1800];
   return html`<figure class="photo ${cls}">
     <img src="${src(1200)}" srcset="${widths.map((w) => `${src(w)} ${w}w`).join(', ')}" sizes="${sizes}"
       width="${1200}" height="${Math.round((1200 * rh) / rw)}" alt="${esc(p.alt)}"
       ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" style="aspect-ratio:${rw}/${rh}">
-    <figcaption>${esc(p.location_on_unsplash)} · Photo: <a href="${p.photographer_url}?${utm}">${esc(p.photographer)}</a> / <a href="${p.page}?${utm}">Unsplash</a></figcaption>
+    <figcaption>${esc(p.location)} · Photo: <a href="${creditUrl(p, p.photographer_url)}">${esc(p.photographer)}</a> / <a href="${creditUrl(p, p.page)}">${SOURCE[p.source]}</a></figcaption>
   </figure>`;
 }
 
@@ -122,7 +129,7 @@ ${body}
     </div>
   </div>
   <div class="wrap footer-small">
-    <p>Travel times, fees and entry rules change. Always check current information before you travel. Photos via <a href="https://unsplash.com/?${utm}">Unsplash</a>, credited on each image.</p>
+    <p>Travel times, fees and entry rules change. Always check current information before you travel. Photos via <a href="https://unsplash.com/?${utm}">Unsplash</a> and <a href="https://www.pexels.com/">Pexels</a>, credited on each image.</p>
     <p>© ${new Date().getFullYear()} ${esc(config.brand.name)}</p>
   </div>
 </footer>
@@ -151,4 +158,4 @@ function pageHero({ eyebrow, title, lede, slot, label }) {
 const badge = (rating) =>
   `<span class="badge badge--${rating}">${{ calm: 'Calm', mixed: 'Mixed', rough: 'Rough' }[rating]}</span>`;
 
-module.exports = { esc, html, photo, hasPhoto, layout, pageHero, badge, used, config, utm };
+module.exports = { esc, html, photo, hasPhoto, layout, pageHero, badge, used, config, utm, SOURCE, creditUrl };

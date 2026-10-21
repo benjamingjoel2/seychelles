@@ -1,4 +1,4 @@
-const { html, esc, photo, layout, pageHero, used, config, utm } = require('../lib/html.js');
+const { html, esc, photo, layout, pageHero, used, config, SOURCE, creditUrl } = require('../lib/html.js');
 const islands = require('../data/islands.js');
 const stays = require('../data/stays.js');
 const journal = require('../data/journal.js');
@@ -131,12 +131,12 @@ ${pageHero({ eyebrow: 'Enquire', title: 'Start planning', lede: 'Tell us a littl
 function creditsPage() {
   const list = [...used.values()].sort((a, b) => a.slot.localeCompare(b.slot));
   const body = html`
-${pageHero({ eyebrow: 'Credits', title: 'Photo credits', lede: 'Every photograph on this site comes from Unsplash and was chosen only when its location on Unsplash matches the place we show it for. Where we have no matching photo yet, we show an illustration instead.' })}
+${pageHero({ eyebrow: 'Credits', title: 'Photo credits', lede: 'Every photograph on this site comes from Unsplash or Pexels and was chosen only when the location given on its source page matches the place we show it for. Where we have no matching photo yet, we show an illustration instead.' })}
 <section class="section"><div class="wrap">
   <div class="table-scroll" tabindex="0" role="region" aria-label="Photo credits">
   <table class="credits">
-    <thead><tr><th scope="col">Used for</th><th scope="col">Location on Unsplash</th><th scope="col">Photographer</th><th scope="col">Photo</th></tr></thead>
-    <tbody>${list.map((p) => `<tr><td>${esc(p.slot)}</td><td>${esc(p.location_on_unsplash)}</td><td><a href="${p.photographer_url}?${utm}">${esc(p.photographer)}</a></td><td><a href="${p.page}?${utm}">View on Unsplash</a></td></tr>`).join('')}</tbody>
+    <thead><tr><th scope="col">Used for</th><th scope="col">Location on source page</th><th scope="col">Photographer</th><th scope="col">Photo</th></tr></thead>
+    <tbody>${list.map((p) => `<tr><td>${esc(p.slot)}</td><td>${esc(p.location)}</td><td><a href="${creditUrl(p, p.photographer_url)}">${esc(p.photographer)}</a></td><td><a href="${creditUrl(p, p.page)}">View on ${SOURCE[p.source]}</a></td></tr>`).join('')}</tbody>
   </table>
   </div>
 </div></section>`;
