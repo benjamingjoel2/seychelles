@@ -11,7 +11,7 @@ module.exports = () => {
   const m = new Date().getMonth();
 
   const body = html`
-${pageHero({ eyebrow: 'Beaches', slot: 'anse-source-d-argent', index: 1, label: 'Anse Source d’Argent', title: 'Beaches, <em>by season</em>', lede: 'Calm or rough depends far more on the wind than on the beach. Pick a month to see which coasts are usually sheltered.' })}
+${pageHero({ eyebrow: 'Beaches', slot: 'anse-source-d-argent', index: 2, label: 'Anse Source d’Argent', title: 'Beaches, <em>by season</em>', lede: 'Calm or rough depends far more on the wind than on the beach. Pick a month to see which coasts are usually sheltered.' })}
 
 <section class="section" id="finder" aria-labelledby="finder-h">
   <div class="wrap">

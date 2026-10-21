@@ -10,7 +10,7 @@ function staysPage() {
   const name = Object.fromEntries(islands.map((i) => [i.slug, i.name]));
   const order = [...new Set(stays.map((s) => s.island))];
   const body = html`
-${pageHero({ eyebrow: 'Stays', slot: 'mahe', index: 1, label: 'Mahé', title: 'Where <em>to stay</em>', lede: 'Small places, mostly: family guesthouses, self-catering cottages and a few island lodges. We match the stay to the season and the coast as much as to the room.' })}
+${pageHero({ eyebrow: 'Stays', slot: 'mahe', index: 3, label: 'Mahé', title: 'Where <em>to stay</em>', lede: 'Small places, mostly: family guesthouses, self-catering cottages and a few island lodges. We match the stay to the season and the coast as much as to the room.' })}
 <section class="section">
   <div class="wrap">
     <p class="placeholder-note"><strong>Placeholder names.</strong> These are examples of the kinds of places we suggest, not real properties. Real partner stays will replace them.</p>
@@ -31,7 +31,7 @@ ${pageHero({ eyebrow: 'Stays', slot: 'mahe', index: 1, label: 'Mahé', title: 'W
 
 function aboutPage() {
   const body = html`
-${pageHero({ eyebrow: 'About', slot: 'anse-lazio', label: 'Anse Lazio', title: `About ${esc(config.brand.name)}`, lede: 'We plan island-hopping trips in the Seychelles for people who want to see more than one beach, and to see each one properly.' })}
+${pageHero({ eyebrow: 'About', slot: 'seychelles-generic', index: 2, label: 'Seychelles', title: `About ${esc(config.brand.name)}`, lede: 'We plan island-hopping trips in the Seychelles for people who want to see more than one beach, and to see each one properly.' })}
 <section class="section">
   <div class="wrap prose narrow">
     <h2>The name</h2>
@@ -55,10 +55,10 @@ ${pageHero({ eyebrow: 'About', slot: 'anse-lazio', label: 'Anse Lazio', title: `
 function journalPages() {
   const posts = [...journal].sort((a, b) => b.date.localeCompare(a.date));
   const index = html`
-${pageHero({ eyebrow: 'Journal', slot: 'praslin', index: 1, label: 'Praslin', title: 'Journal', lede: 'Notes on wind, water, ferries and forests.' })}
+${pageHero({ eyebrow: 'Journal', slot: 'la-digue', index: 9, label: 'La Digue', title: 'Journal', lede: 'Notes on wind, water, ferries and forests.' })}
 <section class="section"><div class="wrap">
   <ul class="cards cards--3">${posts.map((p) => html`<li class="card">
-    ${photo(p.photo, { ratio: '3:2', sizes: '(min-width: 900px) 33vw, 100vw', label: p.title })}
+    ${photo(p.photo, { index: p.photoIndex || 0, ratio: '3:2', sizes: '(min-width: 900px) 33vw, 100vw', label: p.title })}
     <div class="card-body"><p class="card-kicker"><time datetime="${p.date}">${fmtDate(p.date)}</time></p><h2 class="h3"><a class="card-link" href="/journal/${p.slug}/">${esc(p.title)}</a></h2><p>${esc(p.dek)}</p></div>
   </li>`)}</ul>
 </div></section>`;
@@ -71,7 +71,7 @@ ${pageHero({ eyebrow: 'Journal', slot: 'praslin', index: 1, label: 'Praslin', ti
     <h1>${esc(p.title)}</h1>
     <p class="lede">${esc(p.dek)}</p>
   </div></header>
-  <div class="wrap narrow">${photo(p.photo, { eager: true, ratio: '16:9', sizes: '(min-width: 760px) 720px, 100vw', label: p.title })}</div>
+  <div class="wrap narrow">${photo(p.photo, { index: p.photoIndex || 0, eager: true, ratio: '16:9', sizes: '(min-width: 760px) 720px, 100vw', label: p.title })}</div>
   <div class="section"><div class="wrap narrow prose">${p.body}</div></div>
 </article>`;
     out.push({ path: `/journal/${p.slug}/`, html: layout({ title: p.title, path: `/journal/${p.slug}/`, body, description: p.dek }) });
@@ -82,7 +82,7 @@ ${pageHero({ eyebrow: 'Journal', slot: 'praslin', index: 1, label: 'Praslin', ti
 function enquirePages() {
   const endpoint = config.enquiryEndpoint;
   const body = html`
-${pageHero({ eyebrow: 'Enquire', slot: 'anse-georgette', label: 'Anse Georgette', title: 'Start <em>planning</em>', lede: 'Tell us a little about your trip. We reply by email, usually within two working days, with a suggested route and any questions. There is no obligation and nothing is booked until you say so.' })}
+${pageHero({ eyebrow: 'Enquire', slot: 'anse-georgette', index: 1, label: 'Anse Georgette', title: 'Start <em>planning</em>', lede: 'Tell us a little about your trip. We reply by email, usually within two working days, with a suggested route and any questions. There is no obligation and nothing is booked until you say so.' })}
 <section class="section">
   <div class="wrap form-wrap">
     <form class="enquiry" method="post" action="${esc(endpoint || `mailto:${config.contact.email}`)}" ${endpoint ? '' : 'enctype="text/plain"'} data-enquiry data-endpoint="${esc(endpoint)}" data-email="${esc(config.contact.email)}" novalidate>

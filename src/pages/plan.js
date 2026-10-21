@@ -74,7 +74,7 @@ module.exports = () => {
   </div>
 </section>`;
 
-  const itinBody = html`${pageHero({ eyebrow: 'Itineraries', slot: 'la-digue', index: 1, label: 'La Digue', title: 'Island-hopping, <em>slowly</em>', lede: 'Three nights is our usual minimum on each main island: enough for a day of arriving, a day of doing and a day of doing nothing.' })}${planner}${samples}`;
+  const itinBody = html`${pageHero({ eyebrow: 'Itineraries', slot: 'la-digue', index: 3, label: 'La Digue', title: 'Island-hopping, <em>slowly</em>', lede: 'Three nights is our usual minimum on each main island: enough for a day of arriving, a day of doing and a day of doing nothing.' })}${planner}${samples}`;
 
   const plannerData = {
     islands: islands.map(({ slug, name, nights, dayTripFrom, expedition, hub }) => ({ slug, name, nights, dayTripFrom, expedition, hub })),
@@ -84,7 +84,7 @@ module.exports = () => {
 
   // When to go
   const whenBody = html`
-${pageHero({ eyebrow: 'When to go', slot: 'seychelles-generic', index: 1, label: 'Île St Pierre', title: 'When <em>to go</em>', lede: 'Warm all year, so the real question is wind and rain. Each season makes some coasts calm and others rough, and the best months depend on what you want to do.' })}
+${pageHero({ eyebrow: 'When to go', slot: 'seychelles-generic', index: 3, label: 'Seychelles', title: 'When <em>to go</em>', lede: 'Warm all year, so the real question is wind and rain. Each season makes some coasts calm and others rough, and the best months depend on what you want to do.' })}
 <section class="section">
   <div class="wrap prose-grid">
     <div class="prose">

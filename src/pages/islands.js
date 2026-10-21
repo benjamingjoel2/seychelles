@@ -73,7 +73,7 @@ ${pageHero({ eyebrow: i.group, title: esc(i.name), lede: esc(i.summary), slot: i
   </div>
 </section>
 ${(photos[i.slug] || []).length > 1
-  ? `<section class="section section--flush"><div class="wrap">${photo(i.slug, { index: 1, ratio: '21:9', sizes: '100vw', label: i.name })}</div></section>`
+  ? `<section class="section section--flush"><div class="wrap">${label(`${i.name} in pictures`)}<ul class="gallery">${(photos[i.slug] || []).slice(1, 9).map((_, k) => `<li>${photo(i.slug, { index: k + 1, ratio: k % 3 === 0 ? '4:5' : '4:3', sizes: '(min-width: 900px) 33vw, 100vw', label: i.name })}</li>`).join('')}</ul></div></section>`
   : ''}
 ${isBeaches.length ? html`
 <section class="section section--granite">

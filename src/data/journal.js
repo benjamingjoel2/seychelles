@@ -22,6 +22,7 @@ module.exports = [
     date: '2026-09-15',
     dek: 'How the inner islands connect, and why we build a little slack into every transfer day.',
     photo: 'la-digue',
+    photoIndex: 7,
     body: `
 <p>Island-hopping in the Seychelles is easier than it looks on the map. Mahé, Praslin and La Digue are linked by fast ferries several times a day, and short domestic flights reach Praslin and a handful of smaller islands.</p>
 <h2>Mahé to Praslin</h2>

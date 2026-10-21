@@ -61,6 +61,7 @@ module.exports = () => {
       <p><a class="link-arrow" href="/about/">How we plan ${arrow()}</a></p>
     </div>
   </div>
+  <div class="wrap wide-photo">${photo('seychelles-generic', { index: 6, ratio: '21:9', sizes: '100vw', label: 'Seychelles coast' })}</div>
 </section>
 
 <section class="section section--rule">
