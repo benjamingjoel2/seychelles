@@ -2,7 +2,7 @@ const { html, photo, layout, pageHero } = require('../lib/html.js');
 
 module.exports = () => {
   const body = html`
-${pageHero({ eyebrow: 'Nature', title: 'Forest, tortoises, birds and reef', lede: 'Islands that have been isolated for a very long time grow their own species. Much of the Seychelles’ land and sea is now protected, and visiting slowly is the best way to see it.' })}
+${pageHero({ eyebrow: 'Nature', slot: 'mahe', label: 'Morne Blanc', title: 'Forest, tortoises, <em>birds and reef</em>', lede: 'Islands that have been isolated for a very long time grow their own species. Much of the Seychelles’ land and sea is now protected, and visiting slowly is the best way to see it.' })}
 
 <nav class="wrap toc" aria-label="On this page">
   <ul><li><a href="#vallee-de-mai">Vallée de Mai &amp; coco de mer</a></li><li><a href="#tortoises">Giant tortoises</a></li><li><a href="#birds">Birds</a></li><li><a href="#reefs">Reefs</a></li><li><a href="#responsibly">Visiting responsibly</a></li></ul>

@@ -60,7 +60,10 @@ The form validates in the browser, includes a honeypot field against spam, and r
 
 ### Photos
 
-Photos come from Unsplash or Pexels, are hotlinked from their CDNs, served at responsive
+Photos come from Unsplash or Pexels. They are **downloaded into `src/assets/photos/`**
+(WebP at 640, 1280 and 1920 px) by `npm run photos` and served from the site's own domain,
+so privacy blockers that stop third-party image hosts can't hide them. After adding a photo
+to `src/data/photos.js`, run `npm run photos` and commit the new files. Photos are served at responsive
 sizes with `srcset`, lazy-loaded below the fold, and credited in every caption and on
 `/credits/`.
 

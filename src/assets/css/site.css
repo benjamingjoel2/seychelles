@@ -165,6 +165,16 @@ h3{font-size:clamp(1.5rem,2.2vw,2rem);line-height:1.05;margin-bottom:.35em}
 .hero-strip li:nth-child(n+3){border-top:1px solid rgba(250,247,242,.22)}
 .hero-strip a{display:grid;gap:.15rem;padding:1rem .75rem 1.25rem 0;text-decoration:none;color:var(--sand)}
 .hero-strip li:nth-child(2n) a{padding-left:.9rem}
+.hero-strip a{position:relative}
+.hs-thumb{display:none}
+@media (min-width:1200px){
+  .hero-strip a{grid-template-columns:88px 1fr;column-gap:1rem;align-items:center}
+  .hs-thumb{display:block;grid-row:1/span 3;width:88px}
+  .hs-thumb img{height:66px;object-fit:cover}
+}
+.band{list-style:none;padding:0;margin:3rem 0 0;display:grid;gap:1rem}
+@media (min-width:700px){.band{grid-template-columns:repeat(3,1fr);gap:1.25rem}}
+@media (min-width:700px){.band li:nth-child(2){margin-top:4rem}}
 .hs-n,.hs-note{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(250,247,242,.75)}
 .hs-name{font-family:var(--font-display);font-size:1.6rem;line-height:1.1}
 .hero-strip a:hover .hs-name{text-decoration:underline;text-decoration-thickness:1px}

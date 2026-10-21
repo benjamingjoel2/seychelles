@@ -1,5 +1,8 @@
 const config = require('../../site.config.js');
 const photos = require('../data/photos.js');
+const PHOTO_WIDTHS = require('./photo-widths.js');
+let photoSizes = {};
+try { photoSizes = require('../data/photo-sizes.json'); } catch { /* no local photos yet */ }
 
 const esc = (s = '') =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -41,17 +44,24 @@ function photo(slot, { index = 0, ratio = '3:2', sizes = '100vw', eager = false,
     </figure>`;
   }
   used.set(p.id, { ...p, slot });
-  const src = (w) =>
-    p.source === 'pexels'
-      ? `${p.img}?auto=compress&cs=tinysrgb&fit=crop&w=${w}&h=${Math.round((w * rh) / rw)}`
-      : `${p.img}?auto=format&fit=crop&w=${w}&ar=${rw}:${rh}&q=72`;
-  const widths = [480, 800, 1200, 1800, 2400];
+  // Self-hosted copies (see scripts/fetch-photos.js); fall back to the source CDN if missing.
+  const local = PHOTO_WIDTHS.map((w) => [`${p.id}-${w}.webp`, w]).filter(([f]) => photoSizes[f]);
+  const srcset = local.length
+    ? local.map(([f]) => `/assets/photos/${f} ${photoSizes[f][0]}w`).join(', ')
+    : [480, 800, 1200, 1800].map((w) => `${remote(p, w, rw, rh)} ${w}w`).join(', ');
+  const fallback = local.length ? `/assets/photos/${local[Math.min(1, local.length - 1)][0]}` : remote(p, 1200, rw, rh);
   return html`<figure class="photo ${cls}">
-    <img src="${src(1200)}" srcset="${widths.map((w) => `${src(w)} ${w}w`).join(', ')}" sizes="${sizes}"
+    <img src="${fallback}" srcset="${srcset}" sizes="${sizes}"
       width="1200" height="${Math.round((1200 * rh) / rw)}" alt="${esc(p.alt)}"
       ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" style="aspect-ratio:${rw}/${rh}">
     ${caption ? `<figcaption>${esc(p.location)} · <a href="${creditUrl(p, p.photographer_url)}">${esc(p.photographer)}</a> / <a href="${creditUrl(p, p.page)}">${SOURCE[p.source]}</a></figcaption>` : ''}
   </figure>`;
+}
+
+function remote(p, w, rw, rh) {
+  return p.source === 'pexels'
+    ? `${p.img}?auto=compress&cs=tinysrgb&fit=crop&w=${w}&h=${Math.round((w * rh) / rw)}`
+    : `${p.img}?auto=format&fit=crop&w=${w}&ar=${rw}:${rh}&q=72`;
 }
 
 const hasPhoto = (slot) => Boolean((photos[slot] || []).length);
@@ -93,7 +103,6 @@ function layout({ title, description = config.brand.description, path = '/', bod
 ${noindex ? '<meta name="robots" content="noindex">' : ''}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://images.unsplash.com">
 <link rel="stylesheet" href="${f.googleFonts}">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <script>document.documentElement.className="js"</script>
@@ -168,7 +177,7 @@ ${scripts.map((s) => `<script src="/assets/js/${s}.js" defer></script>`).join('\
 /**
  * Inner-page header: label, very large title, lede; optional full-width photo below.
  */
-function pageHero({ eyebrow, n, title, lede, slot, label: lbl, ratio = '21:9', aside = '' }) {
+function pageHero({ eyebrow, n, title, lede, slot, index = 0, label: lbl, ratio = '21:9', aside = '' }) {
   return html`<section class="page-hero">
     <div class="wrap">
       <div class="page-hero-top">
@@ -178,7 +187,7 @@ function pageHero({ eyebrow, n, title, lede, slot, label: lbl, ratio = '21:9', a
       <h1 class="display">${title}</h1>
       ${lede ? `<div class="page-hero-lede"><p class="lede">${lede}</p></div>` : ''}
     </div>
-    ${slot ? `<div class="page-hero-media">${photo(slot, { eager: true, ratio, sizes: '100vw', label: lbl || title })}</div>` : ''}
+    ${slot ? `<div class="page-hero-media">${photo(slot, { index, eager: true, ratio, sizes: '100vw', label: lbl || title })}</div>` : ''}
   </section>`;
 }
 

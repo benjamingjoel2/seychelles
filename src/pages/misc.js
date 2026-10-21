@@ -10,7 +10,7 @@ function staysPage() {
   const name = Object.fromEntries(islands.map((i) => [i.slug, i.name]));
   const order = [...new Set(stays.map((s) => s.island))];
   const body = html`
-${pageHero({ eyebrow: 'Stays', title: 'Where to stay', lede: 'Small places, mostly: family guesthouses, self-catering cottages and a few island lodges. We match the stay to the season and the coast as much as to the room.' })}
+${pageHero({ eyebrow: 'Stays', slot: 'mahe', index: 1, label: 'Mahé', title: 'Where <em>to stay</em>', lede: 'Small places, mostly: family guesthouses, self-catering cottages and a few island lodges. We match the stay to the season and the coast as much as to the room.' })}
 <section class="section">
   <div class="wrap">
     <p class="placeholder-note"><strong>Placeholder names.</strong> These are examples of the kinds of places we suggest, not real properties. Real partner stays will replace them.</p>
@@ -31,7 +31,7 @@ ${pageHero({ eyebrow: 'Stays', title: 'Where to stay', lede: 'Small places, most
 
 function aboutPage() {
   const body = html`
-${pageHero({ eyebrow: 'About', title: `About ${esc(config.brand.name)}`, lede: 'We plan island-hopping trips in the Seychelles for people who want to see more than one beach, and to see each one properly.' })}
+${pageHero({ eyebrow: 'About', slot: 'anse-lazio', label: 'Anse Lazio', title: `About ${esc(config.brand.name)}`, lede: 'We plan island-hopping trips in the Seychelles for people who want to see more than one beach, and to see each one properly.' })}
 <section class="section">
   <div class="wrap prose narrow">
     <h2>The name</h2>
@@ -55,7 +55,7 @@ ${pageHero({ eyebrow: 'About', title: `About ${esc(config.brand.name)}`, lede: '
 function journalPages() {
   const posts = [...journal].sort((a, b) => b.date.localeCompare(a.date));
   const index = html`
-${pageHero({ eyebrow: 'Journal', title: 'Journal', lede: 'Notes on wind, water, ferries and forests.' })}
+${pageHero({ eyebrow: 'Journal', slot: 'praslin', index: 1, label: 'Praslin', title: 'Journal', lede: 'Notes on wind, water, ferries and forests.' })}
 <section class="section"><div class="wrap">
   <ul class="cards cards--3">${posts.map((p) => html`<li class="card">
     ${photo(p.photo, { ratio: '3:2', sizes: '(min-width: 900px) 33vw, 100vw', label: p.title })}
@@ -82,7 +82,7 @@ ${pageHero({ eyebrow: 'Journal', title: 'Journal', lede: 'Notes on wind, water, 
 function enquirePages() {
   const endpoint = config.enquiryEndpoint;
   const body = html`
-${pageHero({ eyebrow: 'Enquire', title: 'Start planning', lede: 'Tell us a little about your trip. We reply by email, usually within two working days, with a suggested route and any questions. There is no obligation and nothing is booked until you say so.' })}
+${pageHero({ eyebrow: 'Enquire', slot: 'anse-georgette', label: 'Anse Georgette', title: 'Start <em>planning</em>', lede: 'Tell us a little about your trip. We reply by email, usually within two working days, with a suggested route and any questions. There is no obligation and nothing is booked until you say so.' })}
 <section class="section">
   <div class="wrap form-wrap">
     <form class="enquiry" method="post" action="${esc(endpoint || `mailto:${config.contact.email}`)}" ${endpoint ? '' : 'enctype="text/plain"'} data-enquiry data-endpoint="${esc(endpoint)}" data-email="${esc(config.contact.email)}" novalidate>

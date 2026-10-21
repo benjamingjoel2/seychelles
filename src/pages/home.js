@@ -1,4 +1,4 @@
-const { html, esc, photo, layout, badge, arrow, label, two } = require('../lib/html.js');
+const { html, esc, photo, hasPhoto, layout, badge, arrow, label, two } = require('../lib/html.js');
 const islands = require('../data/islands.js');
 const { beaches } = require('../data/beaches.js');
 const itineraries = require('../data/itineraries.js');
@@ -44,6 +44,7 @@ module.exports = () => {
   <ol class="hero-strip wrap" aria-label="Where to start">
     ${strip.map(([s, t], k) => html`<li>
       <a href="/islands/${s}/">
+        ${hasPhoto(s) ? `<span class="hs-thumb">${photo(s, { ratio: '4:3', sizes: '96px', caption: false })}</span>` : ''}
         <span class="hs-n">${two(k + 1)}</span>
         <span class="hs-name">${esc(by[s].name)}</span>
         <span class="hs-note">${esc(t)}</span>
@@ -88,6 +89,9 @@ module.exports = () => {
           <span class="further-note">${esc(i.kicker)}</span>
         </a>
       </li>`)}
+    </ul>
+    <ul class="band">
+      ${[['silhouette', 'Silhouette'], ['outer-islands', 'Alphonse, outer islands'], ['port-launay', 'Port Launay, Mahé']].map(([slot, t]) => `<li>${photo(slot, { ratio: '4:5', sizes: '(min-width: 900px) 33vw, 100vw', label: t })}</li>`)}
     </ul>
   </div>
 </section>

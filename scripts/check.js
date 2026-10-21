@@ -16,7 +16,11 @@ for (const f of files) {
   ids[pageOf(f)] = new Set(list);
   const dup = list.filter((x, i) => list.indexOf(x) !== i);
   if (dup.length) problems.push(`${pageOf(f)}: duplicate ids ${[...new Set(dup)].join(', ')}`);
-  for (const m of h.matchAll(/<img\b[^>]*>/g)) if (!/\salt="[^"]+"/.test(m[0])) problems.push(`${pageOf(f)}: image without alt`);
+  for (const m of h.matchAll(/<img\b[^>]*>/g)) {
+    if (!/\salt="[^"]+"/.test(m[0])) problems.push(`${pageOf(f)}: image without alt`);
+    const srcs = [(m[0].match(/\ssrc="([^"]+)"/) || [])[1], ...((m[0].match(/\ssrcset="([^"]+)"/) || [])[1] || '').split(',').map((x) => x.trim().split(' ')[0])];
+    for (const src of srcs) if (src && src.startsWith('/') && !fs.existsSync(path.join(DIST, src))) problems.push(`${pageOf(f)}: missing image ${src}`);
+  }
 }
 for (const f of files) {
   const h = fs.readFileSync(f, 'utf8');
@@ -29,4 +33,4 @@ for (const f of files) {
   }
 }
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
-console.log(`Checked ${files.length} pages: links, anchors, alt text and ids OK.`);
+console.log(`Checked ${files.length} pages: links, anchors, images, alt text and ids OK.`);

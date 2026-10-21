@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node build.js",
     "dev": "node build.js --serve",
-    "check": "node build.js && node scripts/check.js"
+    "check": "node build.js && node scripts/check.js",
+    "photos": "NODE_USE_ENV_PROXY=1 node scripts/fetch-photos.js"
   },
   "engines": { "node": ">=18" }
 }

@@ -22,7 +22,7 @@ function monthStrip(b) {
 
 module.exports = () => {
   const index = html`
-${pageHero({ eyebrow: 'Islands', n: 1, title: 'The <em>islands</em>', lede: 'Granite islands close to Mahé, coral cays at the edge of the bank, and atolls far to the south-west. Here is how they differ, and how long we would give each.' })}
+${pageHero({ eyebrow: 'Islands', n: 1, slot: 'silhouette', label: 'Silhouette', title: 'The <em>islands</em>', lede: 'Granite islands close to Mahé, coral cays at the edge of the bank, and atolls far to the south-west. Here is how they differ, and how long we would give each.' })}
 <section class="section section--rule">
   <div class="wrap">
     ${['Inner islands · granite', 'Inner islands · coral', 'Outer islands · coral'].map((g, gi) => html`
