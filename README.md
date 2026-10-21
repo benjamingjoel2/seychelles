@@ -27,7 +27,7 @@ npm run check    # build, then check internal links, anchors, alt text and dupli
 
 | To change… | Edit |
 |---|---|
-| Brand name, tagline, story, contact details, form endpoint, colours | `site.config.js` (**the only file needed to rebrand**) |
+| Brand name, tagline, story, contact details, form endpoint, colours, fonts | `site.config.js` (**the only file needed to rebrand**) |
 | Islands: text, highlights, suggested nights | `src/data/islands.js` |
 | Beaches and their seasonal exposure | `src/data/beaches.js` |
 | Planner legs, times and visiting order | `src/data/routes.js` |
@@ -42,7 +42,7 @@ npm run check    # build, then check internal links, anchors, alt text and dupli
 
 ### Rebranding
 
-Change `brand`, `contact`, `url` and `palette` in `site.config.js` and rebuild. The other
+Change `brand`, `contact`, `url`, `palette` and `fonts` in `site.config.js` and rebuild. Fonts load from Google Fonts: Instrument Serif (display), Inter Tight (text) and IBM Plex Mono (labels). The other
 brand option, **Lamer Seychelles** ("lamer" is Seychellois Creole for "the sea"), is noted
 in the config. The favicon, logo colours, theme colour and CSS tokens all follow the palette.
 

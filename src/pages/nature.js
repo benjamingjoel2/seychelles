@@ -12,7 +12,7 @@ ${pageHero({ eyebrow: 'Nature', title: 'Forest, tortoises, birds and reef', lede
   <div class="wrap split split--media">
     ${photo('coco-de-mer', { ratio: '4:5', sizes: '(min-width: 900px) 45vw, 100vw', label: 'Coco de mer' })}
     <div class="prose">
-      <p class="eyebrow">Praslin</p>
+      <p class="label">Praslin</p>
       <h2>The Vallée de Mai and the coco de mer</h2>
       <p>The Vallée de Mai is a palm forest in the middle of Praslin, protected as a UNESCO World Heritage Site and managed by the Seychelles Islands Foundation. It is one of only two places where the coco de mer grows wild: the other is neighbouring Curieuse.</p>
       <p>The coco de mer produces the largest seed of any plant. Male and female trees are separate; the nuts take years to mature, and a palm can live for centuries. Walking under the fronds, many metres overhead, is the closest thing the islands have to a cathedral.</p>
@@ -26,7 +26,7 @@ ${pageHero({ eyebrow: 'Nature', title: 'Forest, tortoises, birds and reef', lede
   <div class="wrap split split--media split--reverse">
     ${photo('giant-tortoise', { ratio: '4:5', sizes: '(min-width: 900px) 45vw, 100vw', label: 'Aldabra giant tortoise' })}
     <div class="prose">
-      <p class="eyebrow">Curieuse, Aldabra and beyond</p>
+      <p class="label">Curieuse, Aldabra and beyond</p>
       <h2>Giant tortoises</h2>
       <p>The Aldabra giant tortoise is one of the largest tortoises in the world. Its home atoll, Aldabra, holds by far the biggest wild population; elsewhere you will meet tortoises roaming free on Curieuse, on Bird Island and in gardens and small reserves across the inner islands.</p>
       <p>They are wild or semi-wild animals. Watch from a respectful distance, never sit on or ride them, and only feed them where rangers say it is allowed.</p>
@@ -39,7 +39,7 @@ ${pageHero({ eyebrow: 'Nature', title: 'Forest, tortoises, birds and reef', lede
   <div class="wrap">
     <div class="split">
       <div class="prose">
-        <p class="eyebrow">Birds</p>
+        <p class="label">Birds</p>
         <h2>Rare land birds and great seabird colonies</h2>
         <p>Several Seychelles birds were once among the rarest in the world. Careful conservation, including moving birds to predator-free islands, has brought some back from the brink. Others are seabirds that nest in huge numbers on the coral islands.</p>
       </div>
@@ -60,7 +60,7 @@ ${pageHero({ eyebrow: 'Nature', title: 'Forest, tortoises, birds and reef', lede
   <div class="wrap split split--media">
     ${photo('reef', { ratio: '4:5', sizes: '(min-width: 900px) 45vw, 100vw', label: 'Coral reef' })}
     <div class="prose">
-      <p class="eyebrow">Under water</p>
+      <p class="label">Under water</p>
       <h2>Reefs</h2>
       <p>Granite reefs around the inner islands, and coral reefs, walls and flats around the coral islands, make the Seychelles good for snorkelling straight from the beach and for diving further out. Marine national parks include Ste Anne and Baie Ternay off Mahé, Port Launay, Curieuse and the waters around Silhouette.</p>
       <p>Coral reefs here, as everywhere, have been hit by marine heatwaves and bleaching. Recovery varies from site to site, which is another reason to go with local guides who know the current state of each reef.</p>

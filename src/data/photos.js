@@ -36,6 +36,15 @@ const list = [
   P('coco-de-mer', 'MvQNOPfufIg', 'https://unsplash.com/photos/large-coconuts-hanging-from-a-palm-tree-MvQNOPfufIg', 'photo-1768295037683-99d69f6a1f31', 'Bram Wouters', 'bram_wouters', 'Fond Ferdinand, Seychelles', 'Coco de mer nuts hanging beneath fan-shaped palm leaves at Fond Ferdinand, Praslin'),
   P('giant-tortoise', 'Bu-fUI69fRo', 'https://unsplash.com/photos/person-feeding-gray-tortoise-during-daytime-Bu-fUI69fRo', 'photo-1536746295297-2539b444b74d', 'Philipp Meeh', 'philmeahh', 'La Digue, Seychelles', 'A giant tortoise taking a leaf from a person’s hand on La Digue'),
   P('giant-tortoise', 'sw0nfMrXxcg', 'https://unsplash.com/photos/brown-turtle-on-brown-wooden-log-sw0nfMrXxcg', 'photo-1593427264099-20e0c3e7fdb2', 'Dan Maisey', 'dwm12', 'Alphonse Island, Seychelles', 'Giant tortoise with a leaf in its mouth on Alphonse Island'),
+  P('silhouette', 'lMflHXxYkvY', 'https://unsplash.com/photos/a-body-of-water-with-trees-and-mountains-in-the-background-lMflHXxYkvY', 'photo-1660128232716-668387ba43a1', 'Datingscout', 'datingscout', 'Anse Mondon, Silhouette, Seychelles', 'The bay at Anse Mondon on Silhouette, with forested hills behind the water'),
+  // Location text names Grand Anse but not the island; the photo's geotag (-4.33, 55.72) is on Praslin.
+  P('grand-anse-praslin', '22gpeEZIx5E', 'https://unsplash.com/photos/aerial-view-photography-of-seashore-near-mountain-under-cumulus-clouds-22gpeEZIx5E', 'photo-1519554299890-d4f8fc17fbe1', 'Alin Meceanu', 'mece', 'Grand Anse beach, Grand Anse, Seychelles', 'Aerial view of the Grand Anse shoreline on Praslin, green hills under cumulus clouds'),
+  P('birds', 'dTRkPQKHmpM', 'https://unsplash.com/photos/dTRkPQKHmpM', 'photo-1519549392186-43a1e7e5877b', 'Alin Meceanu', 'mece', 'Vallée de Mai Nature Reserve, Seychelles', 'A Seychelles black parrot in the Vallée de Mai, Praslin'),
+  P('birds', 'f-cNYW949Xc', 'https://unsplash.com/photos/black-eagle-on-air-f-cNYW949Xc', 'photo-1545936476-36a4acaf76fd', 'Thomas Lipke', 't_lipke', 'seychelles', 'A frigatebird in flight over the Seychelles'),
+  // Photographer's description: "From a Topview on St.Annes NP Seychelles".
+  P('reef', '9RpJ7dUzUvY', 'https://unsplash.com/photos/shark-surrounded-by-school-of-fish-9RpJ7dUzUvY', 'photo-1543399912-7bf72f0ef234', 'Thomas Lipke', 't_lipke', 'Ste Anne Marine National Park, Seychelles', 'A shark and a school of fish seen from above in the clear water of Ste Anne Marine National Park'),
+  // Pexels location field says only "Seychelles"; the photographer's title names Port Launay.
+  X('port-launay', '12987329', 'https://www.pexels.com/photo/port-launay-marine-national-park-12987329/', 'https://images.pexels.com/photos/12987329/pexels-photo-12987329.jpeg', 'Matteo Parisi', 'https://www.pexels.com/@matteo-parisi-27261509/', 'Port Launay Marine National Park, Seychelles', 'Aerial view of Port Launay bay on Mahé, with yachts at anchor in turquoise water'),
 ];
 
 const bySlot = {};

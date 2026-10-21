@@ -13,6 +13,7 @@ The file each fact lives in is given in brackets.
 - [ ] **Tourism / environmental sustainability levy** charged per night by accommodation. Check amounts and which islands it applies to. Not on the site yet.
 - [ ] Health requirements (e.g. yellow fever certificate if arriving from an endemic country). Not on the site yet.
 - [ ] **Coco de mer export**: nuts may only be exported with an official certificate/permit, bought from licensed sellers. (`src/pages/nature.js`, `src/data/journal.js`)
+- [ ] Home page label "Indian Ocean · 4°S 55°E" (approximate coordinates of Mahé).
 - [ ] Time zone: Seychelles is **UTC+4**, with no daylight saving. (`site.config.js` contact hours)
 
 ## Getting around: times (`src/data/routes.js`, `src/data/islands.js`, journal)
@@ -100,4 +101,8 @@ Also check:
 ## Photos
 
 - [ ] Each photo in `src/data/photos.js` was accepted because its location on its Unsplash or Pexels page names the place it illustrates (recorded verbatim in `location`). Re-check occasionally that the photos are still online and the locations unchanged.
-- [ ] Slots still without a matching photo, which show an illustration instead: Silhouette, Curieuse, Bird Island, Denis, Aldabra, birds, reefs, Anse Takamaka, Port Launay, Côte d’Or, Grand Anse (Praslin), Grand Anse (La Digue), Anse Cocos, Anse Sévère.
+- [ ] Slots still without a matching photo, which show an illustration instead: Curieuse, Bird Island, Denis, Aldabra, Anse Takamaka, Côte d’Or, Grand Anse (La Digue), Anse Cocos, Anse Sévère.
+- [ ] Three photos rest on more than the location field, so re-check them:
+  - Grand Anse (Praslin): the location text doesn't name the island, but the photo's geotag is on Praslin.
+  - Ste Anne reef: the location is "Seychelles"; the photographer's description names Ste Anne National Park.
+  - Port Launay (Pexels): the location is "Seychelles"; the photo title names Port Launay Marine National Park.

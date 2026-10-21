@@ -9,6 +9,6 @@
   var badge = list.querySelector('.badge');
   var badgeHtml = badge ? badge.outerHTML : '';
   list.innerHTML = data.beaches.filter(function (b) { return b.months[m] === 'calm'; }).map(function (b) {
-    return '<li><a href="/beaches/#' + b.slug + '">' + b.name + '</a> <span class="muted">' + b.island + '</span> ' + badgeHtml + '</li>';
+    return '<li><a href="/beaches/#' + b.slug + '">' + b.name + '</a><span class="label">' + b.island + '</span>' + badgeHtml + '</li>';
   }).join('');
 })();

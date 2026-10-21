@@ -16,30 +16,41 @@ const creditUrl = (p, url) => (p.source === 'unsplash' ? `${url}?${utm}` : url);
 /** Every photo used on the site, collected for the credits page. */
 const used = new Map();
 
+const two = (n) => String(n).padStart(2, '0');
+
+/** Arrow inside a circle, used on pill buttons and links. */
+const arrow = (dir = 'right') =>
+  `<span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12"><path d="${
+    dir === 'up-right' ? 'M4 12 12 4M5.5 4H12v6.5' : 'M2 8h11M9 4l4 4-4 4'
+  }" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span>`;
+
+/** Small uppercase monospace label, e.g. "(02) Islands". */
+const label = (text, n) => `<p class="label">${n != null ? `<span class="label-n">(${two(n)})</span> ` : ''}${esc(text)}</p>`;
+
 /**
  * Responsive photo with credit. If no location-verified photo exists for `slot`,
- * renders a drawn placeholder instead — never a photo of somewhere else.
+ * renders a drawn placeholder instead, never a photo of somewhere else.
  */
-function photo(slot, { index = 0, ratio = '3:2', sizes = '100vw', eager = false, cls = '', label = '' } = {}) {
+function photo(slot, { index = 0, ratio = '3:2', sizes = '100vw', eager = false, cls = '', label: lbl = '', caption = true } = {}) {
   const list = photos[slot] || [];
   const p = list[index % (list.length || 1)];
   const [rw, rh] = ratio.split(':').map(Number);
   if (!p) {
     return html`<figure class="photo photo--placeholder ${cls}">
-      <div class="placeholder-art" style="aspect-ratio:${rw}/${rh}" role="img" aria-label="${esc(label || slot)}: illustration, photograph to come"><span>${esc(label)}</span></div>
+      <div class="placeholder-art" style="aspect-ratio:${rw}/${rh}" role="img" aria-label="${esc(lbl || slot)}: illustration, photograph to come"><span>${esc(lbl)}</span></div>
     </figure>`;
   }
   used.set(p.id, { ...p, slot });
   const src = (w) =>
     p.source === 'pexels'
       ? `${p.img}?auto=compress&cs=tinysrgb&fit=crop&w=${w}&h=${Math.round((w * rh) / rw)}`
-      : `${p.img}?auto=format&fit=crop&w=${w}&ar=${rw}:${rh}&q=70`;
-  const widths = [480, 800, 1200, 1800];
+      : `${p.img}?auto=format&fit=crop&w=${w}&ar=${rw}:${rh}&q=72`;
+  const widths = [480, 800, 1200, 1800, 2400];
   return html`<figure class="photo ${cls}">
     <img src="${src(1200)}" srcset="${widths.map((w) => `${src(w)} ${w}w`).join(', ')}" sizes="${sizes}"
-      width="${1200}" height="${Math.round((1200 * rh) / rw)}" alt="${esc(p.alt)}"
+      width="1200" height="${Math.round((1200 * rh) / rw)}" alt="${esc(p.alt)}"
       ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" style="aspect-ratio:${rw}/${rh}">
-    <figcaption>${esc(p.location)} · Photo: <a href="${creditUrl(p, p.photographer_url)}">${esc(p.photographer)}</a> / <a href="${creditUrl(p, p.page)}">${SOURCE[p.source]}</a></figcaption>
+    ${caption ? `<figcaption>${esc(p.location)} · <a href="${creditUrl(p, p.photographer_url)}">${esc(p.photographer)}</a> / <a href="${creditUrl(p, p.page)}">${SOURCE[p.source]}</a></figcaption>` : ''}
   </figure>`;
 }
 
@@ -56,13 +67,16 @@ const NAV = [
   ['/about/', 'About'],
 ];
 
-function layout({ title, description = config.brand.description, path = '/', body, scripts = [], data = null, noindex = false }) {
+/**
+ * Page shell. `overlay: true` puts a transparent header over a full-bleed dark hero.
+ */
+function layout({ title, description = config.brand.description, path = '/', body, scripts = [], data = null, noindex = false, overlay = false }) {
   const fullTitle = path === '/' ? `${config.brand.name} · ${config.brand.tagline}` : `${title} · ${config.brand.name}`;
   const navItems = NAV.map(
-    ([href, label]) =>
-      `<li><a href="${href}"${path.startsWith(href) ? ' aria-current="page"' : ''}>${label}</a></li>`
+    ([href, l]) => `<li><a href="${href}"${path.startsWith(href) ? ' aria-current="page"' : ''}>${l}</a></li>`
   ).join('');
   const c = config.contact;
+  const f = config.fonts;
   return html`<!doctype html>
 <html lang="en" class="no-js">
 <head>
@@ -75,61 +89,71 @@ function layout({ title, description = config.brand.description, path = '/', bod
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="${config.url}${path}">
-<meta name="theme-color" content="${config.palette.ocean}">
+<meta name="theme-color" content="${config.palette.night}">
 ${noindex ? '<meta name="robots" content="noindex">' : ''}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com">
+<link rel="stylesheet" href="${f.googleFonts}">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <script>document.documentElement.className="js"</script>
+<style>:root{--font-display:${f.display};--font-text:${f.text};--font-mono:${f.mono}}</style>
 <link rel="stylesheet" href="/assets/css/site.css">
 </head>
-<body>
+<body${overlay ? ' class="has-overlay"' : ''}>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
-  <div class="wrap header-inner">
+<header class="site-header${overlay ? ' site-header--overlay' : ''}">
+  <div class="header-inner">
     <a class="logo" href="/" aria-label="${esc(config.brand.name)}, home">
-      <svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M4 30c4-10 9-16 15-16 5 0 7 4 11 4 3 0 5-2 6-3v15H4z" fill="var(--granite)"/><path d="M4 31c6-2 10 2 16 0s10-2 16 0v5H4z" fill="var(--ocean-bright)"/></svg>
-      <span class="logo-text">${esc(config.brand.name)}</span>
+      <span class="logo-word">${esc(config.brand.name)}</span>
+      <span class="logo-sub">Seychelles</span>
     </a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" hidden>Menu</button>
-    <nav id="site-nav" class="site-nav" aria-label="Main"><ul>${navItems}<li class="nav-cta"><a class="btn btn--small" href="/enquire/"${path.startsWith('/enquire') ? ' aria-current="page"' : ''}>Enquire</a></li></ul></nav>
+    <nav id="site-nav" class="site-nav" aria-label="Main"><ul>${navItems}<li class="nav-enquire"><a href="/enquire/">Enquire</a></li></ul></nav>
+    <div class="header-actions">
+      <a class="pill pill--solid" href="/enquire/"${path.startsWith('/enquire') ? ' aria-current="page"' : ''}>Enquire ${arrow('up-right')}</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" hidden><span class="menu-lines" aria-hidden="true"></span><span class="menu-word">Menu</span></button>
+    </div>
   </div>
 </header>
 <main id="main">
 ${body}
 </main>
 <footer class="site-footer">
-  <div class="wrap footer-grid">
-    <div>
-      <p class="footer-brand">${esc(config.brand.name)}</p>
-      <p>${esc(config.brand.tagline)}.</p>
+  <div class="wrap">
+    <div class="footer-top">
+      <p class="footer-statement">${esc(config.brand.tagline)}.</p>
+      <a class="pill pill--light" href="/enquire/">Start planning ${arrow()}</a>
     </div>
-    <div>
-      <h2 class="footer-h">Contact</h2>
-      <ul class="plain">
-        <li><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></li>
-        <li><a href="tel:${esc(c.phone.replace(/\s+/g, ''))}">${esc(c.phone)}</a></li>
-        ${c.whatsapp ? `<li><a href="https://wa.me/${esc(c.whatsapp.replace(/\D/g, ''))}">WhatsApp</a></li>` : ''}
-        <li>${esc(c.address)}</li>
-        <li>${esc(c.hours)}</li>
-      </ul>
-    </div>
-    <div>
-      <h2 class="footer-h">Explore</h2>
-      <ul class="plain">${NAV.map(([h, l]) => `<li><a href="${h}">${l}</a></li>`).join('')}</ul>
-    </div>
-    <div>
-      <h2 class="footer-h">Plan</h2>
-      <ul class="plain">
-        <li><a href="/itineraries/#planner">Island-hopping planner</a></li>
-        <li><a href="/beaches/#finder">Calm beach finder</a></li>
-        <li><a href="/enquire/">Send an enquiry</a></li>
-        <li><a href="/credits/">Photo credits</a></li>
-        ${config.social.instagram ? `<li><a href="${esc(config.social.instagram)}">Instagram</a></li>` : ''}
-      </ul>
+    <div class="footer-grid">
+      <div>
+        <h2 class="label">Contact</h2>
+        <ul class="plain">
+          <li><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></li>
+          <li><a href="tel:${esc(c.phone.replace(/\s+/g, ''))}">${esc(c.phone)}</a></li>
+          ${c.whatsapp ? `<li><a href="https://wa.me/${esc(c.whatsapp.replace(/\D/g, ''))}">WhatsApp</a></li>` : ''}
+          <li>${esc(c.address)}</li>
+          <li>${esc(c.hours)}</li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="label">Explore</h2>
+        <ul class="plain">${NAV.map(([h, l]) => `<li><a href="${h}">${l}</a></li>`).join('')}</ul>
+      </div>
+      <div>
+        <h2 class="label">Plan</h2>
+        <ul class="plain">
+          <li><a href="/itineraries/#planner">Island-hopping planner</a></li>
+          <li><a href="/beaches/#finder">Calm beach finder</a></li>
+          <li><a href="/enquire/">Send an enquiry</a></li>
+          <li><a href="/credits/">Photo credits</a></li>
+          ${config.social.instagram ? `<li><a href="${esc(config.social.instagram)}">Instagram</a></li>` : ''}
+        </ul>
+      </div>
     </div>
   </div>
+  <p class="footer-wordmark" aria-hidden="true">${esc(config.brand.name)}</p>
   <div class="wrap footer-small">
-    <p>Travel times, fees and entry rules change. Always check current information before you travel. Photos via <a href="https://unsplash.com/?${utm}">Unsplash</a> and <a href="https://www.pexels.com/">Pexels</a>, credited on each image.</p>
+    <p>Travel times, fees and entry rules change: always check before you travel. Photos via <a href="https://unsplash.com/?${utm}">Unsplash</a> and <a href="https://www.pexels.com/">Pexels</a>, credited on each image.</p>
     <p>© ${new Date().getFullYear()} ${esc(config.brand.name)}</p>
   </div>
 </footer>
@@ -141,21 +165,24 @@ ${scripts.map((s) => `<script src="/assets/js/${s}.js" defer></script>`).join('\
 `;
 }
 
-/** Simple page header used by most inner pages. */
-function pageHero({ eyebrow, title, lede, slot, label }) {
-  return html`<section class="page-hero${slot ? ' page-hero--photo' : ''}">
-    <div class="wrap page-hero-inner">
-      <div class="page-hero-text">
-        ${eyebrow ? `<p class="eyebrow">${esc(eyebrow)}</p>` : ''}
-        <h1>${title}</h1>
-        ${lede ? `<p class="lede">${lede}</p>` : ''}
+/**
+ * Inner-page header: label, very large title, lede; optional full-width photo below.
+ */
+function pageHero({ eyebrow, n, title, lede, slot, label: lbl, ratio = '21:9', aside = '' }) {
+  return html`<section class="page-hero">
+    <div class="wrap">
+      <div class="page-hero-top">
+        ${eyebrow ? label(eyebrow, n) : ''}
+        ${aside ? `<div class="page-hero-aside">${aside}</div>` : ''}
       </div>
-      ${slot ? photo(slot, { eager: true, ratio: '4:3', sizes: '(min-width: 900px) 50vw, 100vw', label: label || title }) : ''}
+      <h1 class="display">${title}</h1>
+      ${lede ? `<div class="page-hero-lede"><p class="lede">${lede}</p></div>` : ''}
     </div>
+    ${slot ? `<div class="page-hero-media">${photo(slot, { eager: true, ratio, sizes: '100vw', label: lbl || title })}</div>` : ''}
   </section>`;
 }
 
 const badge = (rating) =>
   `<span class="badge badge--${rating}">${{ calm: 'Calm', mixed: 'Mixed', rough: 'Rough' }[rating]}</span>`;
 
-module.exports = { esc, html, photo, hasPhoto, layout, pageHero, badge, used, config, utm, SOURCE, creditUrl };
+module.exports = { esc, html, photo, hasPhoto, layout, pageHero, badge, used, config, utm, SOURCE, creditUrl, arrow, label, two };

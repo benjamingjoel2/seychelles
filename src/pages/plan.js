@@ -19,7 +19,7 @@ module.exports = () => {
 <section class="section" id="planner" aria-labelledby="planner-h">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Island-hopping planner</p>
+      <p class="label">Island-hopping planner</p>
       <h2 id="planner-h">Build a route</h2>
       <p>Pick the islands you would like to see. We will put them in a sensible order from Mahé, show each crossing and suggest how many nights to spend. Adjust the nights to suit you, then send the route with your enquiry.</p>
     </div>
@@ -61,7 +61,7 @@ module.exports = () => {
   const samples = html`
 <section class="section section--granite">
   <div class="wrap">
-    <div class="section-head"><p class="eyebrow">Sample itineraries</p><h2>Routes we like</h2><p>Starting points, not packages. Each one can be opened in the planner and changed.</p></div>
+    <div class="section-head"><p class="label">Sample itineraries</p><h2>Routes we like</h2><p>Starting points, not packages. Each one can be opened in the planner and changed.</p></div>
     <div class="itins">
       ${itineraries.map((it) => html`<article class="itin" id="${it.slug}">
         <p class="card-kicker">${it.nights} nights</p>

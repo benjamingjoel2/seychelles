@@ -16,7 +16,7 @@ ${pageHero({ eyebrow: 'Beaches', title: 'Beaches, by season', lede: 'Calm or rou
 <section class="section" id="finder" aria-labelledby="finder-h">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Calm beach finder</p>
+      <p class="label">Calm beach finder</p>
       <h2 id="finder-h">Which beaches are calm in <span data-finder-month>${MONTHS[m]}</span>?</h2>
       <p>From roughly December to March the <strong>north-west monsoon</strong> makes north- and west-facing coasts choppier. From roughly May to October the <strong>south-east trades</strong> do the same to south- and east-facing coasts. April and November, in between, are usually calm almost everywhere.</p>
     </div>

@@ -1,16 +1,18 @@
 // Mobile menu toggle. Without JS the full navigation is simply shown.
 (function () {
+  var header = document.querySelector('.site-header');
   var btn = document.querySelector('.menu-toggle');
-  var nav = document.getElementById('site-nav');
-  if (!btn || !nav) return;
+  if (!header || !btn) return;
+  var word = btn.querySelector('.menu-word');
   btn.hidden = false;
-  btn.addEventListener('click', function () {
-    var open = nav.classList.toggle('open');
+  function set(open) {
+    header.classList.toggle('open', open);
     btn.setAttribute('aria-expanded', String(open));
-    btn.textContent = open ? 'Close' : 'Menu';
-  });
+    word.textContent = open ? 'Close' : 'Menu';
+  }
+  btn.addEventListener('click', function () { set(!header.classList.contains('open')); });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && nav.classList.contains('open')) { btn.click(); btn.focus(); }
+    if (e.key === 'Escape' && header.classList.contains('open')) { set(false); btn.focus(); }
   });
 })();
 

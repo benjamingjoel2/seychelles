@@ -1,4 +1,4 @@
-const { html, esc, photo, layout, pageHero, badge } = require('../lib/html.js');
+const { html, esc, photo, hasPhoto, layout, pageHero, badge, arrow, label, two } = require('../lib/html.js');
 const islands = require('../data/islands.js');
 const { beaches } = require('../data/beaches.js');
 const stays = require('../data/stays.js');
@@ -22,19 +22,21 @@ function monthStrip(b) {
 
 module.exports = () => {
   const index = html`
-${pageHero({ eyebrow: 'Islands', title: 'The islands', lede: 'Granite islands close to Mahé, coral cays at the edge of the bank, and atolls far to the south-west. Here is how they differ, and how long we would give each.' })}
-<section class="section">
+${pageHero({ eyebrow: 'Islands', n: 1, title: 'The <em>islands</em>', lede: 'Granite islands close to Mahé, coral cays at the edge of the bank, and atolls far to the south-west. Here is how they differ, and how long we would give each.' })}
+<section class="section section--rule">
   <div class="wrap">
-    ${['Inner islands · granite', 'Inner islands · coral', 'Outer islands · coral'].map((g) => html`
-      <h2 class="group-h">${g}</h2>
-      <ul class="cards cards--3">
-        ${islands.filter((i) => i.group === g).map((i) => html`<li class="card">
-          ${photo(i.slug, { ratio: '4:3', sizes: '(min-width: 900px) 33vw, 100vw', label: i.name })}
-          <div class="card-body">
-            <p class="card-kicker">${esc(i.kicker)} · ${nightsText(i)}</p>
-            <h3><a class="card-link" href="/islands/${i.slug}/">${esc(i.name)}</a></h3>
+    ${['Inner islands · granite', 'Inner islands · coral', 'Outer islands · coral'].map((g, gi) => html`
+      <div class="section-intro section-intro--compact">${label(g, gi + 2)}</div>
+      <ul class="island-rows island-rows--index">
+        ${islands.filter((i) => i.group === g).map((i) => html`<li class="island-row${hasPhoto(i.slug) ? '' : ' island-row--text'}">
+          <p class="ir-n">${two(islands.indexOf(i) + 1)}</p>
+          <h2 class="ir-name"><a href="/islands/${i.slug}/">${esc(i.name)}</a></h2>
+          <div class="ir-body">
+            <p class="label">${esc(i.kicker)} · ${nightsText(i)}</p>
             <p>${esc(i.summary)}</p>
+            <a class="pill pill--outline" href="/islands/${i.slug}/" aria-label="Explore ${esc(i.name)}">Explore ${arrow()}</a>
           </div>
+          ${hasPhoto(i.slug) ? `<div class="ir-media">${photo(i.slug, { ratio: '4:3', sizes: '(min-width: 960px) 34vw, 100vw', label: i.name })}</div>` : ''}
         </li>`)}
       </ul>`)}
   </div>

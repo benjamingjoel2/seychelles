@@ -38,6 +38,18 @@ module.exports = {
   //   'https://formspree.io/f/xxxxxxx'
   enquiryEndpoint: '',
 
+  /**
+   * Typography (Google Fonts). `googleFonts` is the css2 URL; the three stacks are used
+   * for display headings, running text, and small uppercase labels.
+   */
+  fonts: {
+    googleFonts:
+      'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap',
+    display: '"Instrument Serif", "Iowan Old Style", Palatino, Georgia, serif',
+    text: '"Inter Tight", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+    mono: '"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace',
+  },
+
   social: {
     instagram: '', // full URL, leave empty to hide
   },
@@ -48,7 +60,8 @@ module.exports = {
    * uses for text; the build fails if any pair drops under WCAG AA (4.5:1).
    */
   palette: {
-    ocean: '#0E3B57', // deep ocean blue: headings, buttons, footer
+    night: '#0B2230', // deepest ocean: dark sections, footer
+    ocean: '#0E3B57', // deep ocean blue: headings, buttons
     oceanBright: '#1C6A93', // links, focus rings
     lagoon: '#D5E8EE', // pale water tint for panels
     granite: '#CDB8B2', // pink-grey granite: decorative bands
@@ -80,6 +93,13 @@ module.exports = {
     ['white', 'ocean'],
     ['white', 'oceanBright'],
     ['sand', 'ocean'],
+    ['sand', 'night'],
+    ['white', 'night'],
+    ['granite', 'night'],
+    ['sand', 'takamaka'],
+    ['takamakaLight', 'takamaka'],
+    ['ink', 'granite'],
+    ['ocean', 'granite'],
     ['granite', 'ocean'],
     ['graniteDeep', 'sand'],
     ['graniteDeep', 'white'],

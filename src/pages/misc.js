@@ -67,7 +67,7 @@ ${pageHero({ eyebrow: 'Journal', title: 'Journal', lede: 'Notes on wind, water, 
     const body = html`
 <article>
   <header class="section article-head"><div class="wrap narrow">
-    <p class="eyebrow"><a href="/journal/">Journal</a> · <time datetime="${p.date}">${fmtDate(p.date)}</time></p>
+    <p class="label"><a href="/journal/">Journal</a> · <time datetime="${p.date}">${fmtDate(p.date)}</time></p>
     <h1>${esc(p.title)}</h1>
     <p class="lede">${esc(p.dek)}</p>
   </div></header>
