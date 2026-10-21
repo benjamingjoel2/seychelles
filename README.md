@@ -1,0 +1,3 @@
+# Seychelles
+
+Seychelles travel project.
