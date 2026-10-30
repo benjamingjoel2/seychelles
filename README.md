@@ -80,6 +80,16 @@ Travel times, fees, entry rules and the beach-exposure model are listed in
 **`FACTS-TO-VERIFY.md`** and must be checked before launch. The site contains no reviews,
 ratings, press logos or awards. Do not add any unless they are real and sourced.
 
+### Languages
+
+The site is in English (default, at the current URLs), French (`/fr/`), German (`/de/`) and Spanish (`/es/`), every page pre-rendered; there is no translation code in the browser.
+
+- `node build.js` builds the English site, then `scripts/translate-site.cjs` writes `dist/fr/`, `dist/de/` and `dist/es/` from the dictionaries in `i18n/<lang>.json` (English text → translation): page text, alt/aria/meta text, the page data used by the planner and beach finder, and the strings in the page scripts. It rewrites internal links to the same language, sets `<html lang>`, canonical and `hreflang` (en, fr, de, es, x-default) and lists every language in the sitemap.
+- The legal pages are written in all four languages (`src/lib/legal.js`), and month-dependent headings are generated, both via `i18n/extra.cjs`.
+- **When you change English copy:** run `node build.js` and `node scripts/translate-site.cjs extract` (writes every translatable string to `i18n/strings.en.json`). The build lists any string without a translation; add it to the three `i18n/<lang>.json` files. `I18N_STRICT=1 node build.js` fails on missing strings.
+- The selector (EN · FR · DE · ES) is in the header on desktop and at the bottom of the menu on smaller screens. Settings live in `i18n/config.json`.
+- Have native speakers review the French, German and Spanish copy before launch.
+
 ### Legal pages
 
 `/privacy/`, `/booking-terms/` and `/cookies/` are generated from `src/lib/legal.js` using the brand
@@ -92,7 +102,7 @@ review all three before launch.
 - Confirm the business address in `site.config.js` (`contact.address`): see the open question in the PR.
 - Set up the `granitecoast@tourground.com` mailbox and point `granitecoast.tourground.com` at the Vercel project.
 - Replace the placeholder stays and request images for them (`IMAGES-NEEDED.md`).
-- Work through `FACTS-TO-VERIFY.md`, and have a lawyer review the legal pages.
+- Work through `FACTS-TO-VERIFY.md`, have a lawyer review the legal pages and native speakers the FR/DE/ES copy.
 
 ## Deploy
 

@@ -75,6 +75,14 @@ function heroPreload(body) {
     : `<link rel="preload" as="image" href="${attr('src')}" fetchpriority="high">\n`;
 }
 
+// Language selector. scripts/translate-site.cjs points each link at the same page in that
+// language and marks the current one; data-lang-link keeps the links out of the URL rewrite.
+const LANGS = [['en', 'English'], ['fr', 'Français'], ['de', 'Deutsch'], ['es', 'Español']];
+const langSelect = (cls) =>
+  `<nav class="lang-select ${cls}" aria-label="Language"><ul>${LANGS.map(
+    ([code, name]) => `<li><a href="/" data-lang-link="${code}" hreflang="${code}" lang="${code}" aria-label="${name}">${code.toUpperCase()}</a></li>`
+  ).join('')}</ul></nav>`;
+
 const hasPhoto = (slot) => Boolean((photos[slot] || []).length);
 
 const NAV = [
@@ -126,8 +134,9 @@ ${heroPreload(body)}<link rel="preload" href="/assets/fonts/InstrumentSerif-400-
       <span class="logo-word">${esc(config.brand.name)}</span>
       <span class="logo-sub">Seychelles</span>
     </a>
-    <nav id="site-nav" class="site-nav" aria-label="Main"><ul>${navItems}<li class="nav-enquire"><a href="/enquire/">Enquire</a></li></ul></nav>
+    <nav id="site-nav" class="site-nav" aria-label="Main"><ul>${navItems}<li class="nav-enquire"><a href="/enquire/">Enquire</a></li><li class="nav-lang">${langSelect('lang-select--menu')}</li></ul></nav>
     <div class="header-actions">
+      ${langSelect('lang-select--header')}
       <a class="pill pill--solid" href="/enquire/"${path.startsWith('/enquire') ? ' aria-current="page"' : ''}>Enquire ${arrow('up-right')}</a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" hidden><span class="menu-lines" aria-hidden="true"></span><span class="menu-word">Menu</span></button>
     </div>

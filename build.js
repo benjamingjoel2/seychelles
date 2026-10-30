@@ -83,6 +83,11 @@ function build() {
   fs.writeFileSync(path.join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${config.url}/sitemap.xml\n`);
 
   console.log(`Built ${pages.length} pages into dist/ in ${Date.now() - t0} ms`);
+  // French, German and Spanish copies of every page (dist/fr/, dist/de/, dist/es/), from i18n/<lang>.json.
+  if (fs.existsSync(path.join(ROOT, 'i18n', 'fr.json'))) {
+    delete require.cache[require.resolve('./scripts/translate-site.cjs')];
+    require('./scripts/translate-site.cjs').build(ROOT, { strict: process.env.I18N_STRICT === '1' });
+  }
   return pages;
 }
 
