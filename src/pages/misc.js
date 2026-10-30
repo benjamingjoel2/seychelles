@@ -1,4 +1,4 @@
-const { html, esc, photo, layout, pageHero, used, config, SOURCE, creditUrl } = require('../lib/html.js');
+const { html, esc, photo, layout, pageHero, config } = require('../lib/html.js');
 const islands = require('../data/islands.js');
 const stays = require('../data/stays.js');
 const journal = require('../data/journal.js');
@@ -46,7 +46,7 @@ ${pageHero({ eyebrow: 'About', slot: 'seychelles-generic', index: 2, label: 'Sey
       <li><strong>Lightly.</strong> We favour small, locally run places and pay-to-enter parks and reserves that fund conservation.</li>
     </ul>
     <h2>Talk to us</h2>
-    <p>Email <a href="mailto:${esc(config.contact.email)}">${esc(config.contact.email)}</a>, call ${esc(config.contact.phone)}, or <a href="/enquire/">send an enquiry</a>.</p>
+    <p>Email <a href="mailto:${esc(config.contact.email)}">${esc(config.contact.email)}</a> or <a href="/enquire/">send an enquiry</a>.</p>
   </div>
 </section>`;
   return { path: '/about/', html: layout({ title: 'About', path: '/about/', body }) };
@@ -88,7 +88,7 @@ ${pageHero({ eyebrow: 'Enquire', slot: 'anse-georgette', index: 1, label: 'Anse 
     <form class="enquiry" method="post" action="${esc(endpoint || `mailto:${config.contact.email}`)}" ${endpoint ? '' : 'enctype="text/plain"'} data-enquiry data-endpoint="${esc(endpoint)}" data-email="${esc(config.contact.email)}" novalidate>
       <div class="field"><label for="f-name">Your name <span class="req">(required)</span></label><input id="f-name" name="name" autocomplete="name" required></div>
       <div class="field"><label for="f-email">Email <span class="req">(required)</span></label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
-      <div class="field"><label for="f-phone">Phone or WhatsApp <span class="opt">(optional)</span></label><input id="f-phone" name="phone" type="tel" autocomplete="tel"></div>
+      <div class="field"><label for="f-phone">Phone <span class="opt">(optional)</span></label><input id="f-phone" name="phone" type="tel" autocomplete="tel"></div>
       <div class="field-row">
         <div class="field"><label for="f-month">Roughly when?</label><input id="f-month" name="travel_month" type="month"></div>
         <div class="field"><label for="f-nights">How many nights?</label><input id="f-nights" name="nights" type="number" min="1" max="60" inputmode="numeric"></div>
@@ -116,7 +116,7 @@ ${pageHero({ eyebrow: 'Enquire', slot: 'anse-georgette', index: 1, label: 'Anse 
     </form>
     <div class="facts">
       <h2 class="facts-h">Prefer to talk?</h2>
-      <p><a href="mailto:${esc(config.contact.email)}">${esc(config.contact.email)}</a><br>${esc(config.contact.phone)}<br>${esc(config.contact.hours)}</p>
+      <p><a href="mailto:${esc(config.contact.email)}">${esc(config.contact.email)}</a><br>${esc(config.contact.hours)}</p>
     </div>
   </div>
 </section>`;
@@ -127,26 +127,9 @@ ${pageHero({ eyebrow: 'Enquire', slot: 'anse-georgette', index: 1, label: 'Anse 
   ];
 }
 
-/** Built last, after every other page has registered the photos it uses. */
-function creditsPage() {
-  const list = [...used.values()].sort((a, b) => a.slot.localeCompare(b.slot));
-  const body = html`
-${pageHero({ eyebrow: 'Credits', title: 'Photo credits', lede: 'Every photograph on this site comes from Unsplash or Pexels and was chosen only when the location given on its source page matches the place we show it for. Where we have no matching photo yet, we show an illustration instead.' })}
-<section class="section"><div class="wrap">
-  <div class="table-scroll" tabindex="0" role="region" aria-label="Photo credits">
-  <table class="credits">
-    <thead><tr><th scope="col">Used for</th><th scope="col">Location on source page</th><th scope="col">Photographer</th><th scope="col">Photo</th></tr></thead>
-    <tbody>${list.map((p) => `<tr><td>${esc(p.slot)}</td><td>${esc(p.location)}</td><td><a href="${creditUrl(p, p.photographer_url)}">${esc(p.photographer)}</a></td><td><a href="${creditUrl(p, p.page)}">View on ${SOURCE[p.source]}</a></td></tr>`).join('')}</tbody>
-  </table>
-  </div>
-</div></section>`;
-  return { path: '/credits/', html: layout({ title: 'Photo credits', path: '/credits/', body }) };
-}
-
 function notFound() {
   const body = html`${pageHero({ eyebrow: '404', title: 'This page has drifted off', lede: 'The page you were looking for is not here. Try the <a href="/islands/">islands</a>, the <a href="/beaches/">beaches</a> or the <a href="/">home page</a>.' })}`;
   return { path: '/404.html', html: layout({ title: 'Page not found', path: '/404.html', body, noindex: true }) };
 }
 
 module.exports = () => [staysPage(), aboutPage(), ...journalPages(), ...enquirePages(), notFound()];
-module.exports.creditsPage = creditsPage;

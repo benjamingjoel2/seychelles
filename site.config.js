@@ -21,14 +21,14 @@ module.exports = {
   },
 
   // Public URL of the deployed site (no trailing slash). Used for canonical links and the sitemap.
-  url: 'https://granite-coast.vercel.app',
+  url: 'https://granitecoast.tourground.com',
 
   contact: {
-    // PLACEHOLDERS — replace with real details before launch.
-    email: 'hello@example.com',
-    phone: '+248 000 0000',
-    whatsapp: '', // e.g. '+2480000000' — leave empty to hide
-    address: 'Victoria, Mahé, Seychelles (placeholder)',
+    // One address per brand, in the owner's format {brandname}@tourground.com.
+    email: 'granitecoast@tourground.com',
+    // Business address. TODO(owner): replace with the coworking-space street address once confirmed
+    // (see the PR: the address could not be verified from this build environment).
+    address: 'Victoria, Mahé, Seychelles',
     hours: 'Mon–Fri, 09:00–17:00 Seychelles time (UTC+4)',
   },
 
@@ -39,20 +39,17 @@ module.exports = {
   enquiryEndpoint: '',
 
   /**
-   * Typography (Google Fonts). `googleFonts` is the css2 URL; the three stacks are used
-   * for display headings, running text, and small uppercase labels.
+   * Typography. The font files are self-hosted in src/assets/fonts/ (fonts.css lists them;
+   * it was generated from this Google Fonts URL, latin + latin-ext subsets:
+   * https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap).
+   * The three stacks are used for display headings, running text, and small uppercase labels.
    */
   fonts: {
-    googleFonts:
-      'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap',
     display: '"Instrument Serif", "Iowan Old Style", Palatino, Georgia, serif',
     text: '"Inter Tight", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
     mono: '"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace',
   },
 
-  social: {
-    instagram: '', // full URL, leave empty to hide
-  },
 
   /**
    * Palette. Names are semantic, so swap values freely.

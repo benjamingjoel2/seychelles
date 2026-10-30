@@ -54,7 +54,7 @@ function photo(slot, { index = 0, ratio = '3:2', sizes = '100vw', eager = false,
     <img src="${fallback}" srcset="${srcset}" sizes="${sizes}"
       width="1200" height="${Math.round((1200 * rh) / rw)}" alt="${esc(p.alt)}"
       ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" style="aspect-ratio:${rw}/${rh}">
-    ${caption ? `<figcaption>${esc(p.location)} · <a href="${creditUrl(p, p.photographer_url)}">${esc(p.photographer)}</a> / <a href="${creditUrl(p, p.page)}">${SOURCE[p.source]}</a></figcaption>` : ''}
+    ${caption ? `<figcaption>${esc(p.location)}</figcaption>` : ''}
   </figure>`;
 }
 
@@ -62,6 +62,17 @@ function remote(p, w, rw, rh) {
   return p.source === 'pexels'
     ? `${p.img}?auto=compress&cs=tinysrgb&fit=crop&w=${w}&h=${Math.round((w * rh) / rw)}`
     : `${p.img}?auto=format&fit=crop&w=${w}&ar=${rw}:${rh}&q=72`;
+}
+
+/** <link rel="preload"> for the first eager (fetchpriority="high") photo, so the hero starts loading before CSS. */
+function heroPreload(body) {
+  const tag = (body.match(/<img\b[^>]*fetchpriority="high"[^>]*>/) || [])[0];
+  if (!tag) return '';
+  const attr = (n) => (tag.match(new RegExp(`\\s${n}="([^"]*)"`)) || [])[1];
+  const srcset = attr('srcset');
+  return srcset
+    ? `<link rel="preload" as="image" imagesrcset="${srcset}" imagesizes="${attr('sizes') || '100vw'}" fetchpriority="high">\n`
+    : `<link rel="preload" as="image" href="${attr('src')}" fetchpriority="high">\n`;
 }
 
 const hasPhoto = (slot) => Boolean((photos[slot] || []).length);
@@ -101,9 +112,7 @@ function layout({ title, description = config.brand.description, path = '/', bod
 <meta property="og:url" content="${config.url}${path}">
 <meta name="theme-color" content="${config.palette.night}">
 ${noindex ? '<meta name="robots" content="noindex">' : ''}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="${f.googleFonts}">
+${heroPreload(body)}<link rel="preload" href="/assets/fonts/InstrumentSerif-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <script>document.documentElement.className="js"</script>
 <style>:root{--font-display:${f.display};--font-text:${f.text};--font-mono:${f.mono}}</style>
@@ -138,8 +147,6 @@ ${body}
         <h2 class="label">Contact</h2>
         <ul class="plain">
           <li><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></li>
-          <li><a href="tel:${esc(c.phone.replace(/\s+/g, ''))}">${esc(c.phone)}</a></li>
-          ${c.whatsapp ? `<li><a href="https://wa.me/${esc(c.whatsapp.replace(/\D/g, ''))}">WhatsApp</a></li>` : ''}
           <li>${esc(c.address)}</li>
           <li>${esc(c.hours)}</li>
         </ul>
@@ -154,15 +161,16 @@ ${body}
           <li><a href="/itineraries/#planner">Island-hopping planner</a></li>
           <li><a href="/beaches/#finder">Calm beach finder</a></li>
           <li><a href="/enquire/">Send an enquiry</a></li>
-          <li><a href="/credits/">Photo credits</a></li>
-          ${config.social.instagram ? `<li><a href="${esc(config.social.instagram)}">Instagram</a></li>` : ''}
+          <li><a href="/privacy/">Privacy policy</a></li>
+          <li><a href="/booking-terms/">Booking terms</a></li>
+          <li><a href="/cookies/">Cookie policy</a></li>
         </ul>
       </div>
     </div>
   </div>
   <p class="footer-wordmark" aria-hidden="true">${esc(config.brand.name)}</p>
   <div class="wrap footer-small">
-    <p>Travel times, fees and entry rules change: always check before you travel. Photos via <a href="https://unsplash.com/?${utm}">Unsplash</a> and <a href="https://www.pexels.com/">Pexels</a>, credited on each image.</p>
+    <p>Travel times, fees and entry rules change: always check before you travel.</p>
     <p>© ${new Date().getFullYear()} ${esc(config.brand.name)}</p>
   </div>
 </footer>

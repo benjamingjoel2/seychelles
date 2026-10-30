@@ -2,7 +2,7 @@
 
 A fast, static travel website for slow island-hopping in the Seychelles. It has:
 
-- **Pages:** home, islands (index plus Mahé, Praslin, La Digue, Silhouette, Curieuse, Bird Island, Denis, the outer islands and Aldabra), beaches, nature, itineraries, when to go, stays, about, journal (3 posts), enquiry form, photo credits, 404.
+- **Pages:** home, islands (index plus Mahé, Praslin, La Digue, Silhouette, Curieuse, Bird Island, Denis, the outer islands and Aldabra), beaches, nature, itineraries, when to go, stays, about, journal (3 posts), enquiry form, privacy policy, booking terms, cookie policy, 404.
 - **Island-hopping planner** (`/itineraries/#planner`): pick islands and it orders them from Mahé, shows each leg (ferry, flight, boat, helicopter or expedition) with rough times and alternatives, and suggests nights on each island. You can change the nights, share a link to the route, or send it with an enquiry.
 - **Calm beach finder** (`/beaches/#finder`): pick a month to see which beaches are usually calm, mixed or rough under the north-west monsoon or the south-east trades. There is also a whole-year table, and the home page shows this month's calm beaches.
 
@@ -42,7 +42,7 @@ npm run check    # build, then check internal links, anchors, alt text and dupli
 
 ### Rebranding
 
-Change `brand`, `contact`, `url`, `palette` and `fonts` in `site.config.js` and rebuild. Fonts load from Google Fonts: Instrument Serif (display), Inter Tight (text) and IBM Plex Mono (labels). The other
+Change `brand`, `contact`, `url`, `palette` and `fonts` in `site.config.js` and rebuild. Fonts are self-hosted from `src/assets/fonts/` (downloaded from Google Fonts, latin and latin-ext subsets): Instrument Serif (display), Inter Tight (text) and IBM Plex Mono (labels). To change a family, replace the files and `fonts.css` there, and the preload in `src/lib/html.js`. The other
 brand option, **Lamer Seychelles** ("lamer" is Seychellois Creole for "the sea"), is noted
 in the config. The favicon, logo colours, theme colour and CSS tokens all follow the palette.
 
@@ -61,11 +61,13 @@ The form validates in the browser, includes a honeypot field against spam, and r
 ### Photos
 
 Photos come from Unsplash or Pexels. They are **downloaded into `src/assets/photos/`**
-(WebP at 640, 1280 and 1920 px) by `npm run photos` and served from the site's own domain,
+(WebP at 640, 960, 1100, 1280 and 1920 px) by `npm run photos` and served from the site's own domain,
 so privacy blockers that stop third-party image hosts can't hide them. After adding a photo
 to `src/data/photos.js`, run `npm run photos` and commit the new files. Photos are served at responsive
-sizes with `srcset`, lazy-loaded below the fold, and credited in every caption and on
-`/credits/`.
+sizes with `srcset` and lazy-loaded below the fold; the hero photo is preloaded. Unsplash and
+Pexels licences do not require attribution, so the site shows only the location in each caption.
+Photographer and source stay recorded in `src/data/photos.js`. If a Creative Commons photo is ever
+added, it must be credited (bring back a credits page for those photos only).
 
 **Rule:** only add a photo when the location on its Unsplash or Pexels page names the place
 it is used for. Copy that text into `location`; it is shown in the caption.
@@ -77,6 +79,20 @@ somewhere else. See `FACTS-TO-VERIFY.md` for the empty slots.
 Travel times, fees, entry rules and the beach-exposure model are listed in
 **`FACTS-TO-VERIFY.md`** and must be checked before launch. The site contains no reviews,
 ratings, press logos or awards. Do not add any unless they are real and sourced.
+
+### Legal pages
+
+`/privacy/`, `/booking-terms/` and `/cookies/` are generated from `src/lib/legal.js` using the brand
+name, email and address in `site.config.js`. The cookie policy lists the one item of browser storage
+the site uses (`plannerRoute`); update it if you add analytics or anything else. Have a lawyer
+review all three before launch.
+
+## Before launch
+
+- Confirm the business address in `site.config.js` (`contact.address`): see the open question in the PR.
+- Set up the `granitecoast@tourground.com` mailbox and point `granitecoast.tourground.com` at the Vercel project.
+- Replace the placeholder stays and request images for them (`IMAGES-NEEDED.md`).
+- Work through `FACTS-TO-VERIFY.md`, and have a lawyer review the legal pages.
 
 ## Deploy
 

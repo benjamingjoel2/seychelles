@@ -59,16 +59,17 @@ function build() {
   // Palette -> CSS custom properties, prepended to the stylesheet.
   const tokens = `:root{${Object.entries(config.palette).map(([k, v]) => `--${kebab(k)}:${v}`).join(';')}}\n`;
   const cssPath = path.join(DIST, 'assets/css/site.css');
-  fs.writeFileSync(cssPath, tokens + fs.readFileSync(cssPath, 'utf8'));
+  // Self-hosted fonts (src/assets/fonts/fonts.css) go into the same stylesheet: one request, no third-party hop.
+  const fontsCss = path.join(DIST, 'assets/fonts/fonts.css');
+  fs.writeFileSync(cssPath, tokens + fs.readFileSync(fontsCss, 'utf8') + fs.readFileSync(cssPath, 'utf8'));
+  fs.rmSync(fontsCss);
 
   // Favicon in brand colours.
   fs.writeFileSync(path.join(DIST, 'assets/favicon.svg'),
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="8" fill="${config.palette.sand}"/><path d="M4 30c4-10 9-16 15-16 5 0 7 4 11 4 3 0 5-2 6-3v15H4z" fill="${config.palette.granite}"/><path d="M4 31c6-2 10 2 16 0s10-2 16 0v5H4z" fill="${config.palette.oceanBright}"/></svg>`);
 
-  const pageModules = ['home', 'islands', 'beaches', 'nature', 'plan', 'misc'];
+  const pageModules = ['home', 'islands', 'beaches', 'nature', 'plan', 'misc', 'legal'];
   const pages = pageModules.flatMap((m) => freshRequire(path.join(SRC, 'pages', `${m}.js`))());
-  // Credits must be built after every other page has registered its photos.
-  pages.push(freshRequire(path.join(SRC, 'pages', 'misc.js')).creditsPage());
 
   for (const p of pages) {
     const file = p.path.endsWith('.html') ? path.join(DIST, p.path) : path.join(DIST, p.path, 'index.html');
