@@ -127,7 +127,7 @@ module.exports = () => {
       <p class="block-lede">The north-west monsoon and the south-east trades make different coasts calm at different times of year. These beaches are usually sheltered this month.</p>
     </div>
     <ul class="calm-list" data-calm-now>
-      ${calmNow.map((b) => `<li><a href="/beaches/#${b.slug}">${esc(b.name)}</a><span class="label">${esc(by[b.island].name)}</span>${badge('calm')}</li>`)}
+      ${calmNow.map((b) => `<li><a href="/beaches/#${b.slug}">${esc(b.name)}</a> <span class="label">${esc(by[b.island].name)}</span> ${badge('calm')}</li>`)}
     </ul>
     <p><a class="link-arrow" href="/beaches/#finder">Every beach, every month ${arrow()}</a></p>
   </div>

@@ -66,7 +66,7 @@
       return '<li class="route-leg"><span class="mode">Return</span> · ' + island[hop.from].name + ' to ' + island[hop.to].name + ' at the end of the expedition' +
         (extraNote ? '<span class="alt">' + extraNote + '</span>' : '') + '</li>';
     }
-    var alts = hop.leg.options.slice(1).map(function (a) { return 'Or ' + MODE[a.mode].toLowerCase() + ', ' + fmt(a); }).join(' · ');
+    var alts = hop.leg.options.slice(1).map(function (a) { return 'Or ' + (document.documentElement.lang === 'de' ? MODE[a.mode] : MODE[a.mode].toLowerCase()) + ', ' + fmt(a); // German nouns keep their capital }).join(' · ');
     return '<li class="route-leg"><span class="mode">' + MODE[o.mode] + '</span> · ' + island[hop.from].name + ' to ' + island[hop.to].name + ', ' + fmt(o) +
       (alts ? '<span class="alt">' + alts + '</span>' : '') +
       '<span class="alt">' + o.note + '</span>' + (extraNote ? '<span class="alt">' + extraNote + '</span>' : '') + '</li>';

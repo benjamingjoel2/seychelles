@@ -1,0 +1,11 @@
+{
+  "dist": "dist",
+  "siteUrl": "https://granitecoast.tourground.com",
+  "locales": ["fr", "de", "es"],
+  "ogLocales": { "en": "en_GB", "fr": "fr_FR", "de": "de_DE", "es": "es_ES" },
+  "cleanUrls": true,
+  "assetPrefixes": ["/assets/"],
+  "scripts": ["assets/js/site.js", "assets/js/home.js", "assets/js/finder.js", "assets/js/planner.js", "assets/js/enquiry.js"],
+  "jsLiteral": "\\s|^[A-Z][a-z]",
+  "skip": []
+}
