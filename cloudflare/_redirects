@@ -1,0 +1,3 @@
+# Cloudflare Pages redirects (same rules as vercel.json)
+/credits/ /about/ 301
+/credits /about/ 301
