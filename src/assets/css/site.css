@@ -546,3 +546,4 @@ input[aria-invalid=true],textarea[aria-invalid=true]{border-color:var(--coral-de
 .lang-select--header{margin-right:.6rem}
 @media (max-width:1099px){.lang-select--header{display:none}.nav-lang{margin-top:.75rem}}
 @media (min-width:1100px){.nav-lang{display:none}}
+.legal-table-wrap{overflow-x:auto;max-width:100%}.legal-table th,.legal-table td{text-align:left;vertical-align:top;padding:.5rem .75rem .5rem 0;border-bottom:1px solid rgba(14,59,87,.2)}.legal-table td{overflow-wrap:anywhere}

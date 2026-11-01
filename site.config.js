@@ -26,9 +26,8 @@ module.exports = {
   contact: {
     // One address per brand, in the owner's format {brandname}@tourground.com.
     email: 'granitecoast@tourground.com',
-    // Business address. TODO(owner): replace with the coworking-space street address once confirmed
-    // (see the PR: the address could not be verified from this build environment).
-    address: 'Victoria, Mahé, Seychelles',
+    // Business address: Blend Seychelles coworking, Abis Center, Providence (Mahé's business hub, next to Victoria).
+    address: 'Blend Seychelles, Abis Center, Providence Industrial Estate, Mahé, Seychelles',
     hours: 'Mon–Fri, 09:00–17:00 Seychelles time (UTC+4)',
   },
 

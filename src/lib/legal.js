@@ -1,367 +1,662 @@
-/** @typedef {{ name: string, kind: string, purpose: string, duration: string }} StorageItem */
-/** @typedef {{ brand: string, email: string, address: string, updated: string, storage?: StorageItem[], enquiryNote?: string, processors?: string[], thirdParty?: string }} LegalOptions */
 /** @typedef {{ title: string, intro: string, sections: { h: string, html: string }[] }} LegalDoc */
 
 /**
- * Legal page copy: Privacy Policy, Booking Terms and Cookie Policy.
- * Written for a tailor-made, enquiry-led travel service. Everything brand-specific
- * comes from the options, so the text stays correct when the config changes.
- *
- * legalPages({ brand, email, address, updated, storage, enquiryNote, processors })
- *   storage:    [{ name, kind, purpose, duration }]  every cookie / browser-storage item the site really uses
- *   enquiryNote: one sentence on how the enquiry form is delivered
- *   processors: list of service providers that handle personal data (hosting, email…)
- *   thirdParty: sentence on third-party requests (fonts, images) and whether they set cookies
- * Returns { privacy, terms, cookies }, each { title, intro, sections: [{ h, html }] }.
+ * Legal page copy in every language: Privacy Policy, Booking Terms and Cookie Policy
+ * (owner checklist, 1 November 2026). {brand}, {email} and {address} are filled in from the options
+ * (src/lib/legal-options.js), so the text follows site.config.js. The cookie table lists exactly what
+ * the site stores (plannerRoute in localStorage).
  */
-/**
- * @param {LegalOptions} options
- * @returns {{ privacy: LegalDoc, terms: LegalDoc, cookies: LegalDoc }}
- */
-function legalPages({ brand, email, address, updated, storage = [], enquiryNote = '', processors = [], thirdParty = "Fonts and images are served from this website's own domain, so no third-party service sets cookies when you browse it." }) {
-  const mail = `<a href="mailto:${email}">${email}</a>`;
-  const list = (items) => `<ul>${items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
+const fill = (doc, o) => JSON.parse(JSON.stringify(doc).replaceAll('{brand}', o.brand).replaceAll('{email}', o.email).replaceAll('{address}', o.address));
 
-  const privacy = {
-    title: 'Privacy Policy',
-    intro: `This policy explains what personal information ${brand} collects when you use this website or plan a trip with us, why we collect it, and the choices you have. Last updated ${updated}.`,
-    sections: [
-      { h: 'Who we are', html: `<p>${brand} plans tailor-made trips. For the purposes of data protection law we are the controller of the personal information described here. You can reach us at ${mail} or by post at ${address}.</p>` },
-      { h: 'What we collect', html: list([
-        '<strong>Enquiry details</strong> you send us: your name, email address, phone number if you choose to give it, travel dates, the number and ages of travellers, your interests, budget range and any other notes.',
-        '<strong>Correspondence</strong>: the emails and messages we exchange while planning your trip.',
-        '<strong>Booking details</strong>, if you go ahead: the names, dates of birth, passport details, dietary or medical needs and emergency contacts that suppliers need to deliver your trip.',
-        '<strong>Technical information</strong>: our hosting provider records standard server logs (IP address, browser type, pages requested, time) to keep the site secure and working.',
-      ]) },
-      { h: 'How we use it', html: list([
-        'To answer your enquiry and prepare a proposal (steps taken at your request before a contract).',
-        'To book and run your trip with hotels, guides, drivers, airlines and other suppliers (performance of our contract with you).',
-        'To meet legal, tax and accounting obligations (legal obligation).',
-        'To keep the website secure and fix problems (our legitimate interests).',
-      ]) + '<p>We do not sell your information, we do not use it for advertising profiles, and we only send you news by email if you have asked us to.</p>' },
-      { h: 'Health and other sensitive information', html: '<p>If you tell us about a medical condition, mobility need or dietary requirement, we use it only to make the trip work for you and share it only with the suppliers who need it. We ask for your consent when we collect it, and you can withdraw that consent at any time.</p>' },
-      { h: 'Who we share it with', html: `<p>We share personal information only where needed:</p>` + list([
-        'with the suppliers who deliver your trip (accommodation, transport, guides, activity providers), some of whom are outside your country;',
-        ...processors.map((p) => p),
-        'with professional advisers, insurers or authorities where the law requires it.',
-      ]) + '<p>Where information goes to another country, we rely on the safeguards available under applicable law, or it is necessary to deliver the trip you have asked for.</p>' },
-      { h: 'How long we keep it', html: '<p>Enquiries that do not turn into a booking are deleted within two years of our last contact. Booking records are kept for as long as tax and consumer law require (usually up to seven years after you travel), then deleted.</p>' },
-      { h: 'Your rights', html: `<p>Depending on where you live, you can ask us to give you a copy of your information, correct it, delete it, restrict or object to how we use it, or transfer it to someone else, and you can withdraw consent at any time. Email ${mail} and we will reply within one month. You also have the right to complain to your local data protection authority.</p>` },
-      { h: 'Security', html: '<p>The site is served over HTTPS. Access to enquiry and booking information is limited to the people who plan your trip.</p>' },
-      { h: 'Cookies', html: '<p>See our <a href="COOKIES_URL">Cookie Policy</a> for the small amount of browser storage this site uses.</p>' },
-      { h: 'Changes', html: '<p>If we change this policy we will update the date at the top of this page.</p>' },
-    ],
-  };
+const DOC_EN = {
+ "privacy": {
+  "title": "Privacy Policy",
+  "intro": "How {brand} collects, uses and protects your personal data when you visit this website, send us an enquiry or book a trip. Last updated: 1 November 2026.",
+  "sections": [
+   {
+    "h": "Who we are",
+    "html": "<p>{brand} plans and arranges tailor-made trips. We are the controller of the personal data described in this policy.</p><p>Address: {address}</p><p>Email: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "What data we collect",
+    "html": "<ul><li>Enquiry details: what you enter in our enquiry form or send us by email, such as your name, email address, travel dates, number of travellers, interests, budget and your message.</li><li>Booking details: when you book, what we need to arrange your trip, such as the full names of travellers as shown in their passports, dates of birth, nationality, arrival and departure details, dietary requirements and, only if you choose to share them, health or mobility needs.</li><li>Correspondence: the emails and messages you exchange with us.</li><li>Technical data: when you visit the site, our hosting provider automatically records server logs with your IP address, browser type, the pages requested and the date and time. They are used only to run the site securely and to fix errors.</li><li>Browser storage: the small items described in our cookie policy.</li></ul><p>We do not collect payment card details through this website, and the site uses no analytics or advertising trackers.</p>"
+   },
+   {
+    "h": "Why we use it and our legal bases",
+    "html": "<ul><li>To answer your enquiry and prepare a proposal: steps taken at your request before entering into a contract, and our legitimate interest in replying to people who contact us.</li><li>To book and run your trip, including passing the necessary details to the suppliers who deliver it: performance of our contract with you.</li><li>To take account of health or mobility information you choose to share: your explicit consent, which you can withdraw at any time.</li><li>To keep the site secure and working, and to handle complaints or legal claims: our legitimate interests.</li><li>To keep accounting and tax records: compliance with our legal obligations.</li><li>To send you news, only if you have asked for it: your consent, which you can withdraw at any time.</li></ul><p>We never sell your personal data, and we do not use it for automated decision-making or profiling.</p>"
+   },
+   {
+    "h": "Who we share it with",
+    "html": "<ul><li>Vercel Inc., which hosts this website and processes the technical logs described above.</li><li>Our email provider, which stores and delivers the messages we exchange with you.</li><li>The travel suppliers who deliver your trip, such as hotels, lodges and camps, transport and transfer companies, airlines, activity providers and park or permit authorities. Each receives only what it needs for your booking.</li><li>Professional advisers, public authorities or courts, where the law requires it or to establish or defend legal claims.</li></ul><p>When you send the enquiry form, it opens your own email program with your message ready to send to us, so the form itself does not transmit your data to any third party.</p><p>Our service providers act on our instructions and must keep your data secure and confidential.</p>"
+   },
+   {
+    "h": "International transfers",
+    "html": "<p>Vercel and some of our other providers may process data in the United States and other countries. Your trip takes place in Seychelles, so the suppliers there receive the details they need. Where data protection law requires it, we rely on adequacy decisions, standard contractual clauses or equivalent safeguards, or on the transfer being necessary to perform the contract you asked us for. You can ask us for details of these safeguards.</p>"
+   },
+   {
+    "h": "How long we keep it",
+    "html": "<ul><li>Enquiries that do not lead to a booking: up to two years after our last contact.</li><li>Booking records: as long as tax and accounting law requires, usually up to seven years after your trip.</li><li>Health or mobility details: deleted once your trip is over, unless you ask us to keep them for a future trip.</li><li>Server logs: kept by our hosting provider for a short period, normally no more than 30 days.</li></ul>"
+   },
+   {
+    "h": "How we protect it",
+    "html": "<p>We keep personal data in access-controlled systems, use encrypted connections (HTTPS) on this site and share data only as described here. If a breach affects your data and puts your rights at risk, we will tell you without undue delay.</p>"
+   },
+   {
+    "h": "Your rights",
+    "html": "<p>Depending on where you live, you have the right to:</p><ul><li>access the personal data we hold about you;</li><li>have inaccurate data corrected (rectification);</li><li>have your data deleted (erasure);</li><li>restrict how we use your data (restriction);</li><li>receive your data in a portable format or have it sent to someone else (portability);</li><li>object to our use of your data based on legitimate interests, and to direct marketing at any time (objection);</li><li>withdraw your consent at any time, without affecting what we did before;</li><li>complain to a data protection supervisory authority, in particular in the country where you live or work.</li></ul><p>To exercise any of these rights, email us. We reply within one month.</p><p>Email: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "Cookies",
+    "html": "<p>This site uses only the browser storage described in our cookie policy.</p><p><a href=\"/cookies/\">Read our cookie policy</a></p>"
+   },
+   {
+    "h": "Children",
+    "html": "<p>This website is not aimed at children and we do not knowingly collect data from children under 16. We only process details of children travelling with their family when a parent or guardian gives them to us for a booking.</p>"
+   },
+   {
+    "h": "Changes to this policy",
+    "html": "<p>We may update this policy when our services or the law change. The date at the top shows when it was last updated.</p>"
+   },
+   {
+    "h": "Contact",
+    "html": "<p>Questions about this policy or your personal data: write to {brand} at the address above, or email us.</p><p>Email: <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ },
+ "terms": {
+  "title": "Booking Terms",
+  "intro": "The terms that apply when you book a trip with {brand}. Please read them before you book: when you confirm a booking, you accept them. Last updated: 1 November 2026.",
+  "sections": [
+   {
+    "h": "1. Who we are",
+    "html": "<p>{brand} (“we”, “us”) plans and arranges tailor-made trips. These terms, together with your proposal and booking confirmation, form your contract with us.</p><p>Address: {address}</p><p>Email: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "2. How a booking is made and confirmed",
+    "html": "<p>Every trip starts with an enquiry. We then send you a written proposal with the itinerary, the price and what is included. Prices on this website are “from” prices per person, given as a guide; your final price is the one confirmed in writing in your proposal.</p><p>Your booking is made when you accept the proposal in writing and pay the deposit, and it is confirmed when we send you a written booking confirmation. The person who makes the booking must be at least 18 years old and accepts these terms on behalf of everyone travelling.</p>"
+   },
+   {
+    "h": "3. Deposit, balance and prices",
+    "html": "<p>A deposit, stated in your proposal, is due when you book. The balance is due on the date shown in your booking confirmation, normally 60 days before departure. If you book less than 60 days before departure, the full price is due when you book.</p><p>If the balance is not paid on time, we may treat the booking as cancelled by you and apply the cancellation charges below.</p><p>Once your booking is confirmed we will not increase the price, except where taxes, park or entry fees or fuel costs imposed by third parties change. We will tell you as soon as possible and show how the change was calculated. If the increase is more than 8% of the trip price, you may cancel and receive a full refund.</p>"
+   },
+   {
+    "h": "4. What is included",
+    "html": "<p>Your proposal and booking confirmation list exactly what is included, typically the accommodation, transport, transfers and activities in your itinerary, and the meals stated.</p><p>Unless stated otherwise, the price does not include international flights, travel insurance, visas, vaccinations, drinks, tips, personal expenses, optional activities or anything not listed as included.</p>"
+   },
+   {
+    "h": "5. Changes by you",
+    "html": "<p>If you want to change your trip after it is confirmed, tell us in writing. We will do our best to make the change, subject to availability. You pay any costs charged by suppliers and any difference in price. Changing your travel dates, or a major change close to departure, may be treated as a cancellation.</p><p>You may transfer your booking to another person who meets all the conditions of the trip by telling us in writing at least 14 days before departure. You and that person are jointly responsible for any balance and for the extra costs the transfer causes.</p>"
+   },
+   {
+    "h": "6. Cancellation by you",
+    "html": "<p>You may cancel at any time by writing to us; the cancellation takes effect on the day we receive it. Unless your booking confirmation sets different charges, we charge the following share of the total trip price:</p><ul><li>More than 60 days before departure: loss of the deposit</li><li>60 to 31 days before departure: 50% of the trip price</li><li>30 to 15 days before departure: 75% of the trip price</li><li>14 days or less before departure, or if you do not travel: 100% of the trip price</li></ul><p>Some elements, such as flights, permits and certain peak-season stays, cannot be refunded once booked; your proposal says so where this applies. Your travel insurance may cover cancellation charges.</p>"
+   },
+   {
+    "h": "7. Changes and cancellation by us",
+    "html": "<p>We plan carefully, but we sometimes have to change arrangements. If we make a minor change, such as a comparable hotel or a different route, we will tell you as soon as we can. If we have to make a significant change or cancel your trip, we will tell you promptly and you may accept the change, choose a comparable alternative, or cancel and receive a full refund of everything you have paid us.</p><p>For departures with a minimum number of travellers, we may cancel if that number is not reached, telling you at least 45 days before departure and refunding everything you have paid us.</p>"
+   },
+   {
+    "h": "8. Travel insurance",
+    "html": "<p>Travel insurance is a condition of booking. Your policy must cover cancellation, medical treatment, emergency evacuation and repatriation, and the activities in your itinerary. Please send us the policy details before you travel.</p>"
+   },
+   {
+    "h": "9. Passports, visas and health",
+    "html": "<p>You are responsible for holding a valid passport, any visas or entry permits, and the vaccinations and health documents your trip requires, and for checking the rules that apply to your nationality. Entry and health rules change; we share the information we have, but please confirm it with the relevant embassy, official government sources and your doctor before you travel.</p>"
+   },
+   {
+    "h": "10. Our responsibility",
+    "html": "<p>We are responsible for arranging the services in your booking confirmation with reasonable skill and care. If any part of your trip is not provided as agreed, tell the supplier and us straight away so we can try to put it right.</p><p>We are not responsible for loss, damage or delay caused by you or a member of your party, by a third party unconnected with the services we arranged, or by unusual and unforeseeable circumstances beyond our control. Where international conventions limit a supplier’s liability, for example for flights, our liability is limited in the same way. Except for death or personal injury caused by our negligence, our liability is limited to the total price of your trip. Nothing in these terms limits rights you have under consumer law that cannot be excluded.</p>"
+   },
+   {
+    "h": "11. Your behaviour",
+    "html": "<p>Please respect the laws and customs of the places you visit, follow the safety instructions of our suppliers and local hosts, and our reasonable instructions. If your behaviour puts others at risk or seriously disturbs them, we or the supplier may end your trip without refund, and you will pay any costs that result.</p>"
+   },
+   {
+    "h": "12. Complaints",
+    "html": "<p>If something goes wrong during your trip, tell the supplier and us straight away so we can try to fix it on the spot. If it is not resolved, email us within 28 days of your return. We acknowledge complaints within 14 days and aim to reply in full within 28 days.</p><p>Email: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "13. Force majeure",
+    "html": "<p>We are not liable for any failure or delay caused by unusual and unforeseeable circumstances beyond our control whose consequences could not have been avoided even with all due care, such as war, civil unrest, terrorism, natural disaster, epidemic, severe weather, strikes, or the closure of airports, borders or parks. If such circumstances prevent your trip from going ahead as booked, we will offer you a comparable alternative or a refund of the money you have paid us.</p>"
+   },
+   {
+    "h": "14. Data protection",
+    "html": "<p>We use your personal data to arrange your trip, as explained in our privacy policy.</p><p><a href=\"/privacy/\">Read our privacy policy</a></p>"
+   },
+   {
+    "h": "15. Governing law",
+    "html": "<p>These terms, and any dispute arising from them, are governed by the law of Seychelles, and the courts of Seychelles have jurisdiction. If you are a consumer, you may also bring proceedings in the courts of the country where you live, and you keep the protection of the mandatory consumer law of that country.</p>"
+   },
+   {
+    "h": "16. Contact",
+    "html": "<p>Questions about these terms or your booking:</p><p>Email: <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ },
+ "cookies": {
+  "title": "Cookie Policy",
+  "intro": "What the {brand} website stores in your browser, and why. Last updated: 1 November 2026.",
+  "sections": [
+   {
+    "h": "What cookies are",
+    "html": "<p>Cookies are small text files that a website saves in your browser. Similar technologies, such as local storage and session storage, let a site keep small pieces of information in your browser. In this policy, “cookies” covers all of them.</p>"
+   },
+   {
+    "h": "What this site uses",
+    "html": "<p>This site sets no cookies. It uses only the browser storage listed below, which is needed for features you choose to use.</p><div class=\"legal-table-wrap\"><table class=\"legal-table\"><thead><tr><th scope=\"col\">Name</th><th scope=\"col\">Purpose</th><th scope=\"col\">Duration</th><th scope=\"col\">Type</th></tr></thead><tbody><tr><td>plannerRoute</td><td>Carries the route you built in the island-hopping planner over to the enquiry form; removed when the enquiry is sent</td><td>Until you clear your browser storage</td><td>Local storage, essential</td></tr></tbody></table></div><p>We do not use analytics, advertising or social-media tracking cookies.</p>"
+   },
+   {
+    "h": "Consent",
+    "html": "<p>Essential items do not need your consent because the site, or a feature you ask for, cannot work without them. If we ever add cookies that are not essential, such as analytics, we will ask for your consent first and update this policy.</p>"
+   },
+   {
+    "h": "Third-party content",
+    "html": "<ul><li>This website is hosted by Vercel, which processes your IP address in its server logs to deliver the pages. Vercel sets no cookies on this site.</li><li>Some photographs are delivered from third-party image servers. Your browser sends your IP address to those servers so they can deliver the images; they set no cookies on this site.</li><li>Our fonts are served from this website, so no font provider receives your data.</li><li>We do not embed maps, videos, social-media widgets or advertising.</li></ul>"
+   },
+   {
+    "h": "How to manage or disable cookies",
+    "html": "<p>You can view and delete cookies and site data at any time in your browser settings, and you can block them altogether. Look for “cookies” or “site data” in the privacy settings of Chrome, Firefox, Safari or Edge; each browser’s help pages explain the steps.</p><p>If you block site storage, the site still works, but the planner will not pass your route to the enquiry form.</p>"
+   },
+   {
+    "h": "Changes to this policy",
+    "html": "<p>We will update this policy if the way this site uses cookies changes. The date at the top shows the latest version.</p>"
+   },
+   {
+    "h": "Contact",
+    "html": "<p>Questions about this policy:</p><p>Email: <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ }
+};
 
-  const terms = {
-    title: 'Booking Terms',
-    intro: `These terms apply when you plan and book a tailor-made trip with ${brand}. Please read them before you confirm a booking. Last updated ${updated}.`,
-    sections: [
-      { h: 'How we work', html: `<p>${brand} designs trips around each traveller. Everything starts with an enquiry: you tell us what you are looking for and we prepare a proposal. Nothing on this website is an offer to sell a fixed product, and no booking exists until we have both confirmed it in writing.</p>` },
-      { h: 'Enquiries and proposals', html: '<p>An enquiry is free and does not commit you to anything. Our proposals describe the itinerary, what is included and the price for your dates and group. Prices depend on availability and on supplier rates, so a proposal is valid for the period stated on it. Until the booking is confirmed, prices and availability can change.</p>' },
-      { h: 'Confirming a booking', html: '<p>To book, you accept the proposal in writing and pay the deposit shown on it. Your booking is confirmed when we send you a written confirmation. The person who makes the booking accepts these terms for everyone travelling and must be at least 18.</p>' },
-      { h: 'Deposits and balance', html: '<p>The deposit amount and the date the balance is due are set out in your proposal and confirmation, because they depend on the suppliers involved. Some elements, such as flights, certain lodges or permits, may need full payment when booked; we will tell you before you commit. If the balance is not paid by the due date we may treat the booking as cancelled by you, and the cancellation charges below apply.</p>' },
-      { h: 'Changes you ask for', html: '<p>We will try to make any change you ask for after confirmation, but it is not always possible. Any extra costs charged by suppliers, plus a reasonable administration cost we will tell you in advance, are payable by you. A change of travel dates may be treated as a cancellation and a new booking.</p>' },
-      { h: 'If you cancel', html: '<p>You can cancel at any time by writing to us. Because we pay suppliers on your behalf, cancellation charges apply. They are set out in your confirmation and increase as the departure date gets closer; they will never be more than the total price of the trip. Your travel insurance may cover these charges in some circumstances.</p>' },
-      { h: 'If we change or cancel', html: '<p>We rarely need to change a confirmed trip, but suppliers sometimes do. If a significant part of your trip has to change, we will tell you as soon as we can and offer a suitable alternative, or a full refund of the money you have paid for the affected arrangements. We will not cancel your trip after confirmation except where the trip cannot safely or lawfully go ahead (for example because of official travel advice, natural disasters or similar events outside our control), or if you have not paid. In those cases we will refund what you have paid for the arrangements that do not go ahead.</p>' },
-      { h: 'Travel insurance', html: '<p>Comprehensive travel insurance is a condition of booking. It should cover cancellation, medical treatment, repatriation and any activities in your itinerary. Please send us your policy details before you travel.</p>' },
-      { h: 'Passports, visas and health', html: '<p>You are responsible for having a valid passport, any visas and entry permits, and meeting the health and vaccination requirements of every country on your itinerary. We are happy to point you to official sources, but rules change and the final responsibility is yours. Please take medical advice well before you travel.</p>' },
-      { h: 'Your responsibilities during the trip', html: '<p>Please follow the reasonable instructions of guides and suppliers, respect local laws and customs, and let us know straight away if something is wrong so we can try to put it right on the spot.</p>' },
-      { h: 'Our responsibility', html: '<p>We take reasonable care in choosing suppliers and planning your trip, and we are responsible for the arrangements we agree to provide. We are not responsible for loss, injury or damage caused by you, by a third party not connected with your trip, or by events outside our control that could not have been foreseen or avoided. Where international conventions limit what airlines, rail or sea carriers or hotels must pay, our liability is limited in the same way. Nothing in these terms limits liability that cannot be limited by law, including for death or personal injury caused by our negligence.</p>' },
-      { h: 'Complaints', html: `<p>If something goes wrong during your trip, tell your guide or the supplier and contact us straight away so we can try to fix it while you are there. If you are still unhappy, write to us at ${mail} within 28 days of your return and we will reply as quickly as we can.</p>` },
-      { h: 'Governing law', html: '<p>These terms are governed by the law that applies to the contract between you and us. Nothing in them affects your statutory rights as a consumer, including any right to bring a claim in the courts where you live.</p>' },
-      { h: 'Contact', html: `<p>${brand}, ${address}. Email ${mail}.</p>` },
-    ],
-  };
+const DOC_FR = {
+ "privacy": {
+  "title": "Politique de confidentialité",
+  "intro": "Comment {brand} collecte, utilise et protège vos données personnelles lorsque vous consultez ce site, nous envoyez une demande ou réservez un voyage. Dernière mise à jour : 1er novembre 2026.",
+  "sections": [
+   {
+    "h": "Qui sommes-nous",
+    "html": "<p>{brand} conçoit et organise des voyages sur mesure. Nous sommes responsables du traitement des données personnelles décrites dans cette politique.</p><p>Adresse : {address}</p><p>E-mail : <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "Quelles données nous collectons",
+    "html": "<ul><li>Données de demande : ce que vous saisissez dans notre formulaire de demande ou nous envoyez par e-mail, par exemple votre nom, votre adresse e-mail, vos dates de voyage, le nombre de voyageurs, vos centres d’intérêt, votre budget et votre message.</li><li>Données de réservation : lorsque vous réservez, ce dont nous avons besoin pour organiser votre voyage, par exemple les noms complets des voyageurs tels qu’ils figurent sur leur passeport, les dates de naissance, la nationalité, les informations d’arrivée et de départ, les régimes alimentaires et, uniquement si vous choisissez de nous les communiquer, des besoins liés à la santé ou à la mobilité.</li><li>Correspondance : les e-mails et messages que vous échangez avec nous.</li><li>Données techniques : lorsque vous consultez le site, notre hébergeur enregistre automatiquement des journaux de serveur contenant votre adresse IP, le type de navigateur, les pages demandées ainsi que la date et l’heure. Ils servent uniquement à faire fonctionner le site en sécurité et à corriger les erreurs.</li><li>Stockage dans le navigateur : les petits éléments décrits dans notre politique relative aux cookies.</li></ul><p>Nous ne collectons aucune donnée de carte bancaire sur ce site, et le site n’utilise aucun outil d’analyse d’audience ni traceur publicitaire.</p>"
+   },
+   {
+    "h": "Pourquoi nous les utilisons et sur quelles bases légales",
+    "html": "<ul><li>Répondre à votre demande et préparer une proposition : mesures précontractuelles prises à votre demande, et notre intérêt légitime à répondre aux personnes qui nous contactent.</li><li>Réserver et organiser votre voyage, y compris transmettre les informations nécessaires aux prestataires qui le réalisent : exécution de notre contrat avec vous.</li><li>Tenir compte des informations de santé ou de mobilité que vous choisissez de partager : votre consentement explicite, que vous pouvez retirer à tout moment.</li><li>Assurer la sécurité et le bon fonctionnement du site, et traiter les réclamations ou litiges : nos intérêts légitimes.</li><li>Tenir notre comptabilité et nos registres fiscaux : respect de nos obligations légales.</li><li>Vous envoyer des nouvelles, uniquement si vous l’avez demandé : votre consentement, que vous pouvez retirer à tout moment.</li></ul><p>Nous ne vendons jamais vos données personnelles et ne les utilisons ni pour des décisions automatisées ni pour du profilage.</p>"
+   },
+   {
+    "h": "Avec qui nous les partageons",
+    "html": "<ul><li>Vercel Inc., qui héberge ce site et traite les journaux techniques décrits ci-dessus.</li><li>Notre fournisseur de messagerie, qui stocke et achemine les e-mails que nous échangeons avec vous.</li><li>Les prestataires qui réalisent votre voyage, comme les hôtels, lodges et camps, les sociétés de transport et de transfert, les compagnies aériennes, les prestataires d’activités et les autorités des parcs ou délivrant les permis. Chacun ne reçoit que ce dont il a besoin pour votre réservation.</li><li>Des conseillers professionnels, des autorités publiques ou des tribunaux, lorsque la loi l’exige ou pour constater, exercer ou défendre des droits en justice.</li></ul><p>Lorsque vous envoyez le formulaire de demande, il ouvre votre propre messagerie avec votre message prêt à nous être envoyé : le formulaire lui-même ne transmet vos données à aucun tiers.</p><p>Nos prestataires agissent sur nos instructions et doivent garantir la sécurité et la confidentialité de vos données.</p>"
+   },
+   {
+    "h": "Transferts internationaux",
+    "html": "<p>Vercel et certains de nos autres prestataires peuvent traiter des données aux États-Unis et dans d’autres pays. Votre voyage a lieu aux Seychelles : les prestataires sur place reçoivent les informations dont ils ont besoin. Lorsque la loi sur la protection des données l’exige, nous nous appuyons sur des décisions d’adéquation, des clauses contractuelles types ou des garanties équivalentes, ou sur le fait que le transfert est nécessaire à l’exécution du contrat que vous nous avez demandé. Vous pouvez nous demander le détail de ces garanties.</p>"
+   },
+   {
+    "h": "Durée de conservation",
+    "html": "<ul><li>Demandes sans réservation : jusqu’à deux ans après notre dernier échange.</li><li>Dossiers de réservation : aussi longtemps que l’exige la législation fiscale et comptable, en général jusqu’à sept ans après votre voyage.</li><li>Informations de santé ou de mobilité : supprimées à la fin de votre voyage, sauf si vous nous demandez de les conserver pour un prochain voyage.</li><li>Journaux de serveur : conservés par notre hébergeur pendant une courte durée, en principe 30 jours au maximum.</li></ul>"
+   },
+   {
+    "h": "Comment nous les protégeons",
+    "html": "<p>Nous conservons les données personnelles dans des systèmes à accès contrôlé, utilisons des connexions chiffrées (HTTPS) sur ce site et ne partageons les données que dans les conditions décrites ici. Si une violation touche vos données et présente un risque pour vos droits, nous vous en informerons dans les meilleurs délais.</p>"
+   },
+   {
+    "h": "Vos droits",
+    "html": "<p>Selon votre lieu de résidence, vous avez le droit :</p><ul><li>d’accéder aux données personnelles que nous détenons sur vous ;</li><li>de faire corriger des données inexactes (rectification) ;</li><li>de faire effacer vos données (effacement) ;</li><li>de limiter l’utilisation de vos données (limitation) ;</li><li>de recevoir vos données dans un format portable ou de les faire transmettre à un tiers (portabilité) ;</li><li>de vous opposer à l’utilisation de vos données fondée sur nos intérêts légitimes, et à tout moment à la prospection (opposition) ;</li><li>de retirer votre consentement à tout moment, sans effet sur les traitements antérieurs ;</li><li>d’introduire une réclamation auprès d’une autorité de contrôle de la protection des données, notamment dans le pays où vous vivez ou travaillez.</li></ul><p>Pour exercer l’un de ces droits, écrivez-nous par e-mail. Nous répondons sous un mois.</p><p>E-mail : <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "Cookies",
+    "html": "<p>Ce site utilise uniquement le stockage dans le navigateur décrit dans notre politique relative aux cookies.</p><p><a href=\"/cookies/\">Lire notre politique relative aux cookies</a></p>"
+   },
+   {
+    "h": "Enfants",
+    "html": "<p>Ce site ne s’adresse pas aux enfants et nous ne collectons pas sciemment de données concernant des enfants de moins de 16 ans. Nous ne traitons les informations d’enfants voyageant en famille que lorsqu’un parent ou tuteur nous les transmet pour une réservation.</p>"
+   },
+   {
+    "h": "Modifications de cette politique",
+    "html": "<p>Nous pouvons mettre à jour cette politique lorsque nos services ou la loi évoluent. La date en haut de la page indique la dernière mise à jour.</p>"
+   },
+   {
+    "h": "Contact",
+    "html": "<p>Pour toute question sur cette politique ou vos données personnelles, écrivez à {brand} à l’adresse ci-dessus ou par e-mail.</p><p>E-mail : <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ },
+ "terms": {
+  "title": "Conditions de réservation",
+  "intro": "Les conditions qui s’appliquent lorsque vous réservez un voyage avec {brand}. Lisez-les avant de réserver : en confirmant une réservation, vous les acceptez. Dernière mise à jour : 1er novembre 2026.",
+  "sections": [
+   {
+    "h": "1. Qui sommes-nous",
+    "html": "<p>{brand} (« nous ») conçoit et organise des voyages sur mesure. Ces conditions, avec votre proposition et votre confirmation de réservation, forment votre contrat avec nous.</p><p>Adresse : {address}</p><p>E-mail : <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "2. Comment se fait et se confirme une réservation",
+    "html": "<p>Chaque voyage commence par une demande. Nous vous envoyons ensuite une proposition écrite avec l’itinéraire, le prix et les prestations incluses. Les prix affichés sur ce site sont des prix « à partir de » par personne, donnés à titre indicatif ; votre prix définitif est celui confirmé par écrit dans votre proposition.</p><p>Votre réservation est effectuée lorsque vous acceptez la proposition par écrit et versez l’acompte ; elle est confirmée lorsque nous vous envoyons une confirmation de réservation écrite. La personne qui réserve doit avoir au moins 18 ans et accepte ces conditions au nom de tous les voyageurs.</p>"
+   },
+   {
+    "h": "3. Acompte, solde et prix",
+    "html": "<p>Un acompte, indiqué dans votre proposition, est dû à la réservation. Le solde est dû à la date figurant sur votre confirmation de réservation, en général 60 jours avant le départ. Si vous réservez moins de 60 jours avant le départ, la totalité du prix est due à la réservation.</p><p>Si le solde n’est pas réglé à temps, nous pouvons considérer la réservation comme annulée par vous et appliquer les frais d’annulation ci-dessous.</p><p>Une fois votre réservation confirmée, nous n’augmentons pas le prix, sauf si des taxes, des droits d’entrée ou de parc ou des coûts de carburant imposés par des tiers changent. Nous vous en informons dès que possible en expliquant le calcul. Si la hausse dépasse 8 % du prix du voyage, vous pouvez annuler et être intégralement remboursé.</p>"
+   },
+   {
+    "h": "4. Ce qui est inclus",
+    "html": "<p>Votre proposition et votre confirmation de réservation indiquent précisément ce qui est inclus, en général l’hébergement, le transport, les transferts et les activités de votre itinéraire, ainsi que les repas mentionnés.</p><p>Sauf mention contraire, le prix ne comprend pas les vols internationaux, l’assurance voyage, les visas, les vaccins, les boissons, les pourboires, les dépenses personnelles, les activités optionnelles ni tout ce qui n’est pas indiqué comme inclus.</p>"
+   },
+   {
+    "h": "5. Modifications de votre part",
+    "html": "<p>Si vous souhaitez modifier votre voyage après confirmation, prévenez-nous par écrit. Nous ferons de notre mieux, sous réserve de disponibilité. Vous prenez en charge les frais facturés par les prestataires et l’éventuelle différence de prix. Un changement de dates, ou une modification importante peu avant le départ, peut être traité comme une annulation.</p><p>Vous pouvez céder votre réservation à une personne remplissant toutes les conditions du voyage en nous prévenant par écrit au moins 14 jours avant le départ. Vous et cette personne êtes solidairement responsables du solde et des frais supplémentaires liés à la cession.</p>"
+   },
+   {
+    "h": "6. Annulation de votre part",
+    "html": "<p>Vous pouvez annuler à tout moment en nous écrivant ; l’annulation prend effet le jour où nous la recevons. Sauf frais différents indiqués dans votre confirmation de réservation, nous facturons la part suivante du prix total du voyage :</p><ul><li>Plus de 60 jours avant le départ : perte de l’acompte</li><li>De 60 à 31 jours avant le départ : 50 % du prix du voyage</li><li>De 30 à 15 jours avant le départ : 75 % du prix du voyage</li><li>14 jours ou moins avant le départ, ou en cas de non-présentation : 100 % du prix du voyage</li></ul><p>Certaines prestations, comme les vols, les permis et certains séjours en haute saison, ne sont pas remboursables une fois réservées ; votre proposition le précise le cas échéant. Votre assurance voyage peut couvrir les frais d’annulation.</p>"
+   },
+   {
+    "h": "7. Modifications et annulation de notre part",
+    "html": "<p>Nous préparons tout avec soin, mais il nous arrive de devoir modifier des prestations. En cas de modification mineure, comme un hôtel équivalent ou un itinéraire différent, nous vous prévenons dès que possible. Si nous devons apporter une modification importante ou annuler votre voyage, nous vous prévenons rapidement et vous pouvez accepter la modification, choisir une alternative comparable, ou annuler et être intégralement remboursé de toutes les sommes versées.</p><p>Pour les départs soumis à un nombre minimum de voyageurs, nous pouvons annuler si ce nombre n’est pas atteint, en vous prévenant au moins 45 jours avant le départ et en vous remboursant toutes les sommes versées.</p>"
+   },
+   {
+    "h": "8. Assurance voyage",
+    "html": "<p>Une assurance voyage est obligatoire pour réserver. Votre contrat doit couvrir l’annulation, les frais médicaux, l’évacuation d’urgence et le rapatriement, ainsi que les activités de votre itinéraire. Merci de nous en transmettre les références avant le départ.</p>"
+   },
+   {
+    "h": "9. Passeports, visas et santé",
+    "html": "<p>Il vous appartient de disposer d’un passeport valide, des visas ou autorisations d’entrée et des vaccinations et documents sanitaires exigés pour votre voyage, et de vérifier les règles applicables à votre nationalité. Ces règles évoluent ; nous partageons les informations dont nous disposons, mais vérifiez-les auprès de l’ambassade concernée, des sources officielles et de votre médecin avant le départ.</p>"
+   },
+   {
+    "h": "10. Notre responsabilité",
+    "html": "<p>Nous sommes responsables de l’organisation des prestations de votre confirmation de réservation avec soin et diligence. Si une partie de votre voyage n’est pas fournie comme convenu, prévenez immédiatement le prestataire et nous-mêmes afin que nous puissions y remédier.</p><p>Nous ne sommes pas responsables des pertes, dommages ou retards causés par vous ou un membre de votre groupe, par un tiers étranger aux prestations organisées, ou par des circonstances exceptionnelles et inévitables indépendantes de notre volonté. Lorsque des conventions internationales limitent la responsabilité d’un prestataire, par exemple pour les vols, notre responsabilité est limitée de la même façon. Sauf en cas de décès ou de dommage corporel dû à notre négligence, notre responsabilité est limitée au prix total de votre voyage. Rien dans ces conditions ne limite les droits impératifs que vous confère le droit de la consommation.</p>"
+   },
+   {
+    "h": "11. Votre comportement",
+    "html": "<p>Merci de respecter les lois et coutumes des lieux visités, les consignes de sécurité de nos prestataires et de vos hôtes, ainsi que nos instructions raisonnables. Si votre comportement met en danger ou gêne gravement d’autres personnes, nous ou le prestataire pouvons mettre fin à votre voyage sans remboursement, et les frais qui en découlent sont à votre charge.</p>"
+   },
+   {
+    "h": "12. Réclamations",
+    "html": "<p>Si un problème survient pendant votre voyage, signalez-le immédiatement au prestataire et à nous afin que nous tentions de le régler sur place. S’il n’est pas résolu, écrivez-nous par e-mail dans les 28 jours suivant votre retour. Nous accusons réception sous 14 jours et nous efforçons de répondre sur le fond sous 28 jours.</p><p>E-mail : <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "13. Force majeure",
+    "html": "<p>Nous ne sommes pas responsables d’un manquement ou d’un retard dû à des circonstances exceptionnelles et inévitables, indépendantes de notre volonté et dont les conséquences n’auraient pu être évitées malgré toutes les précautions, comme une guerre, des troubles civils, le terrorisme, une catastrophe naturelle, une épidémie, des intempéries graves, des grèves ou la fermeture d’aéroports, de frontières ou de parcs. Si de telles circonstances empêchent votre voyage d’avoir lieu comme prévu, nous vous proposons une alternative comparable ou le remboursement des sommes versées.</p>"
+   },
+   {
+    "h": "14. Protection des données",
+    "html": "<p>Nous utilisons vos données personnelles pour organiser votre voyage, comme l’explique notre politique de confidentialité.</p><p><a href=\"/privacy/\">Lire notre politique de confidentialité</a></p>"
+   },
+   {
+    "h": "15. Droit applicable",
+    "html": "<p>Ces conditions, et tout litige qui en découle, sont régis par le droit des Seychelles, et les tribunaux des Seychelles sont compétents. Si vous êtes un consommateur, vous pouvez aussi saisir les tribunaux du pays où vous résidez et vous conservez la protection des règles impératives du droit de la consommation de ce pays.</p>"
+   },
+   {
+    "h": "16. Contact",
+    "html": "<p>Pour toute question sur ces conditions ou votre réservation :</p><p>E-mail : <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ },
+ "cookies": {
+  "title": "Politique relative aux cookies",
+  "intro": "Ce que le site de {brand} enregistre dans votre navigateur, et pourquoi. Dernière mise à jour : 1er novembre 2026.",
+  "sections": [
+   {
+    "h": "Qu’est-ce qu’un cookie",
+    "html": "<p>Les cookies sont de petits fichiers texte qu’un site enregistre dans votre navigateur. Des technologies similaires, comme le stockage local et le stockage de session, permettent à un site de conserver de petites informations dans votre navigateur. Dans cette politique, le terme « cookies » les couvre toutes.</p>"
+   },
+   {
+    "h": "Ce que ce site utilise",
+    "html": "<p>Ce site ne dépose aucun cookie. Il utilise uniquement le stockage dans le navigateur listé ci-dessous, nécessaire aux fonctions que vous choisissez d’utiliser.</p><div class=\"legal-table-wrap\"><table class=\"legal-table\"><thead><tr><th scope=\"col\">Nom</th><th scope=\"col\">Finalité</th><th scope=\"col\">Durée</th><th scope=\"col\">Type</th></tr></thead><tbody><tr><td>plannerRoute</td><td>Transmet l’itinéraire construit dans le planificateur d’îles au formulaire de demande ; supprimé à l’envoi de la demande</td><td>Jusqu’à ce que vous effaciez les données de votre navigateur</td><td>Stockage local, essentiel</td></tr></tbody></table></div><p>Nous n’utilisons aucun cookie d’analyse d’audience, de publicité ou de suivi par les réseaux sociaux.</p>"
+   },
+   {
+    "h": "Consentement",
+    "html": "<p>Les éléments essentiels ne nécessitent pas votre consentement, car le site, ou une fonction que vous demandez, ne peut fonctionner sans eux. Si nous ajoutons un jour des cookies non essentiels, par exemple de mesure d’audience, nous vous demanderons d’abord votre consentement et mettrons cette politique à jour.</p>"
+   },
+   {
+    "h": "Contenus tiers",
+    "html": "<ul><li>Ce site est hébergé par Vercel, qui traite votre adresse IP dans ses journaux de serveur pour afficher les pages. Vercel ne dépose aucun cookie sur ce site.</li><li>Certaines photos sont diffusées par des serveurs d’images tiers. Votre navigateur leur transmet votre adresse IP pour recevoir les images ; ils ne déposent aucun cookie sur ce site.</li><li>Nos polices de caractères sont hébergées sur ce site : aucun fournisseur de polices ne reçoit vos données.</li><li>Nous n’intégrons ni cartes, ni vidéos, ni modules de réseaux sociaux, ni publicité.</li></ul>"
+   },
+   {
+    "h": "Gérer ou désactiver les cookies",
+    "html": "<p>Vous pouvez à tout moment consulter et supprimer les cookies et données de site dans les paramètres de votre navigateur, ou les bloquer entièrement. Cherchez « cookies » ou « données de site » dans les paramètres de confidentialité de Chrome, Firefox, Safari ou Edge ; l’aide de chaque navigateur détaille la marche à suivre.</p><p>Si vous bloquez le stockage, le site fonctionne toujours, mais le planificateur ne transmettra pas votre itinéraire au formulaire.</p>"
+   },
+   {
+    "h": "Modifications de cette politique",
+    "html": "<p>Nous mettrons cette politique à jour si l’usage des cookies sur ce site change. La date en haut de la page indique la dernière version.</p>"
+   },
+   {
+    "h": "Contact",
+    "html": "<p>Pour toute question sur cette politique :</p><p>E-mail : <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ }
+};
 
-  const table = storage.length
-    ? `<div class="legal-table"><table><thead><tr><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Purpose</th><th scope="col">How long</th></tr></thead><tbody>${storage
-        .map((s) => `<tr><td><code>${s.name}</code></td><td>${s.kind}</td><td>${s.purpose}</td><td>${s.duration}</td></tr>`)
-        .join('')}</tbody></table></div>`
-    : '';
-  const cookies = {
-    title: 'Cookie Policy',
-    intro: `This page lists every cookie and every piece of browser storage this website uses. Last updated ${updated}.`,
-    sections: [
-      { h: 'What we use', html: storage.length
-        ? `<p>This site sets no advertising or tracking cookies and runs no analytics. It uses only the following, all strictly necessary for features you use:</p>${table}`
-        : '<p>This site sets no cookies and uses no browser storage. It runs no analytics, advertising or tracking scripts.</p>' },
-      { h: 'Third parties', html: `<p>${enquiryNote ? enquiryNote + ' ' : ''}${thirdParty}</p>` },
-      { h: 'Consent', html: storage.length
-        ? '<p>Because everything listed above is strictly necessary for a feature you choose to use, the law does not require us to ask for consent first, so there is no cookie banner. If we ever add analytics or anything else that is not strictly necessary, we will ask for your consent before it runs and update this page.</p>'
-        : '<p>Because nothing is stored on your device, there is nothing to consent to and no cookie banner. If we ever add analytics or anything else that is not strictly necessary, we will ask for your consent before it runs and update this page.</p>' },
-      { h: 'How to remove or block it', html: '<p>You can delete cookies and site data at any time in your browser settings (usually under Privacy or Site settings), and you can block them for this site. The site will still work; features that rely on local storage will simply forget your progress.</p>' },
-      { h: 'Contact', html: `<p>Questions about this policy: ${mail}.</p>` },
-    ],
-  };
-  return { privacy, terms, cookies };
-}
+const DOC_DE = {
+ "privacy": {
+  "title": "Datenschutzerklärung",
+  "intro": "Wie {brand} Ihre personenbezogenen Daten erhebt, nutzt und schützt, wenn Sie diese Website besuchen, uns eine Anfrage senden oder eine Reise buchen. Zuletzt aktualisiert: 1. November 2026.",
+  "sections": [
+   {
+    "h": "Wer wir sind",
+    "html": "<p>{brand} plant und organisiert maßgeschneiderte Reisen. Wir sind Verantwortlicher für die in dieser Erklärung beschriebenen personenbezogenen Daten.</p><p>Anschrift: {address}</p><p>E-Mail: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "Welche Daten wir erheben",
+    "html": "<ul><li>Anfragedaten: was Sie in unser Anfrageformular eingeben oder uns per E-Mail senden, etwa Name, E-Mail-Adresse, Reisedaten, Zahl der Reisenden, Interessen, Budget und Ihre Nachricht.</li><li>Buchungsdaten: bei einer Buchung, was wir zur Organisation Ihrer Reise brauchen, etwa die vollständigen Namen der Reisenden laut Reisepass, Geburtsdaten, Staatsangehörigkeit, An- und Abreisedaten, Ernährungswünsche und, nur wenn Sie sie uns mitteilen möchten, gesundheitliche Bedürfnisse oder Mobilitätsbedürfnisse.</li><li>Korrespondenz: die E-Mails und Nachrichten, die Sie mit uns austauschen.</li><li>Technische Daten: Beim Besuch der Website speichert unser Hosting-Anbieter automatisch Serverprotokolle mit Ihrer IP-Adresse, dem Browsertyp, den aufgerufenen Seiten sowie Datum und Uhrzeit. Sie dienen nur dem sicheren Betrieb der Website und der Fehlerbehebung.</li><li>Speicher im Browser: die kleinen Einträge, die in unserer Cookie-Richtlinie beschrieben sind.</li></ul><p>Wir erheben über diese Website keine Zahlungskartendaten, und die Website nutzt keine Analyse- oder Werbe-Tracker.</p>"
+   },
+   {
+    "h": "Wozu wir sie nutzen und auf welcher Rechtsgrundlage",
+    "html": "<ul><li>Beantwortung Ihrer Anfrage und Erstellung eines Angebots: vorvertragliche Maßnahmen auf Ihre Anfrage sowie unser berechtigtes Interesse, Menschen zu antworten, die uns kontaktieren.</li><li>Buchung und Durchführung Ihrer Reise, einschließlich der Weitergabe der nötigen Angaben an die ausführenden Leistungsträger: Erfüllung unseres Vertrags mit Ihnen.</li><li>Berücksichtigung von Gesundheits- oder Mobilitätsangaben, die Sie uns freiwillig mitteilen: Ihre ausdrückliche Einwilligung, die Sie jederzeit widerrufen können.</li><li>Sicherer und funktionsfähiger Betrieb der Website sowie Bearbeitung von Beschwerden oder Rechtsansprüchen: unsere berechtigten Interessen.</li><li>Führung von Buchhaltungs- und Steuerunterlagen: Erfüllung unserer rechtlichen Pflichten.</li><li>Zusendung von Neuigkeiten, nur wenn Sie darum gebeten haben: Ihre Einwilligung, die Sie jederzeit widerrufen können.</li></ul><p>Wir verkaufen Ihre personenbezogenen Daten niemals und nutzen sie weder für automatisierte Entscheidungen noch für Profiling.</p>"
+   },
+   {
+    "h": "An wen wir sie weitergeben",
+    "html": "<ul><li>Vercel Inc., das diese Website hostet und die oben beschriebenen technischen Protokolle verarbeitet.</li><li>Unser E-Mail-Anbieter, der die Nachrichten speichert und zustellt, die wir mit Ihnen austauschen.</li><li>Die Leistungsträger, die Ihre Reise durchführen, etwa Hotels, Lodges und Camps, Transport- und Transferunternehmen, Fluggesellschaften, Anbieter von Aktivitäten sowie Park- und Genehmigungsbehörden. Jeder erhält nur, was er für Ihre Buchung braucht.</li><li>Berater, Behörden oder Gerichte, wenn das Gesetz es verlangt oder um Rechtsansprüche geltend zu machen oder abzuwehren.</li></ul><p>Wenn Sie das Anfrageformular absenden, öffnet es Ihr eigenes E-Mail-Programm mit Ihrer Nachricht an uns; das Formular selbst übermittelt Ihre Daten an keinen Dritten.</p><p>Unsere Dienstleister handeln nach unseren Weisungen und müssen Ihre Daten sicher und vertraulich behandeln.</p>"
+   },
+   {
+    "h": "Internationale Übermittlungen",
+    "html": "<p>Vercel und einige unserer anderen Dienstleister können Daten in den Vereinigten Staaten und anderen Ländern verarbeiten. Ihre Reise findet auf den Seychellen statt, daher erhalten die Leistungsträger vor Ort die Angaben, die sie brauchen. Wo das Datenschutzrecht es verlangt, stützen wir uns auf Angemessenheitsbeschlüsse, Standardvertragsklauseln oder gleichwertige Garantien oder darauf, dass die Übermittlung zur Erfüllung des von Ihnen gewünschten Vertrags erforderlich ist. Auf Anfrage nennen wir Ihnen diese Garantien.</p>"
+   },
+   {
+    "h": "Wie lange wir sie speichern",
+    "html": "<ul><li>Anfragen ohne Buchung: bis zu zwei Jahre nach unserem letzten Kontakt.</li><li>Buchungsunterlagen: so lange, wie Steuer- und Handelsrecht es verlangen, in der Regel bis zu sieben Jahre nach Ihrer Reise.</li><li>Gesundheits- oder Mobilitätsangaben: werden nach Ende Ihrer Reise gelöscht, sofern Sie uns nicht bitten, sie für eine künftige Reise aufzubewahren.</li><li>Serverprotokolle: werden von unserem Hosting-Anbieter nur kurz gespeichert, in der Regel höchstens 30 Tage.</li></ul>"
+   },
+   {
+    "h": "Wie wir sie schützen",
+    "html": "<p>Wir speichern personenbezogene Daten in zugriffsgeschützten Systemen, nutzen auf dieser Website verschlüsselte Verbindungen (HTTPS) und geben Daten nur wie hier beschrieben weiter. Betrifft eine Datenpanne Ihre Daten und gefährdet sie Ihre Rechte, informieren wir Sie unverzüglich.</p>"
+   },
+   {
+    "h": "Ihre Rechte",
+    "html": "<p>Je nach Wohnsitz haben Sie das Recht,</p><ul><li>Auskunft über die personenbezogenen Daten zu erhalten, die wir über Sie speichern;</li><li>unrichtige Daten berichtigen zu lassen (Berichtigung);</li><li>Ihre Daten löschen zu lassen (Löschung);</li><li>die Verarbeitung Ihrer Daten einschränken zu lassen (Einschränkung);</li><li>Ihre Daten in einem übertragbaren Format zu erhalten oder an einen Dritten übermitteln zu lassen (Datenübertragbarkeit);</li><li>der Verarbeitung auf Grundlage berechtigter Interessen und jederzeit der Direktwerbung zu widersprechen (Widerspruch);</li><li>eine Einwilligung jederzeit mit Wirkung für die Zukunft zu widerrufen;</li><li>sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren, insbesondere in dem Land, in dem Sie leben oder arbeiten.</li></ul><p>Um eines dieser Rechte auszuüben, schreiben Sie uns eine E-Mail. Wir antworten innerhalb eines Monats.</p><p>E-Mail: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "Cookies",
+    "html": "<p>Diese Website nutzt nur den in unserer Cookie-Richtlinie beschriebenen Browserspeicher.</p><p><a href=\"/cookies/\">Unsere Cookie-Richtlinie lesen</a></p>"
+   },
+   {
+    "h": "Kinder",
+    "html": "<p>Diese Website richtet sich nicht an Kinder, und wir erheben wissentlich keine Daten von Kindern unter 16 Jahren. Angaben zu Kindern, die mit ihrer Familie reisen, verarbeiten wir nur, wenn ein Elternteil oder Erziehungsberechtigter sie uns für eine Buchung mitteilt.</p>"
+   },
+   {
+    "h": "Änderungen dieser Erklärung",
+    "html": "<p>Wir können diese Erklärung aktualisieren, wenn sich unsere Leistungen oder die Rechtslage ändern. Das Datum oben zeigt die letzte Aktualisierung.</p>"
+   },
+   {
+    "h": "Kontakt",
+    "html": "<p>Fragen zu dieser Erklärung oder Ihren personenbezogenen Daten richten Sie bitte an {brand} unter der oben genannten Anschrift oder per E-Mail.</p><p>E-Mail: <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ },
+ "terms": {
+  "title": "Buchungsbedingungen",
+  "intro": "Die Bedingungen, die gelten, wenn Sie eine Reise bei {brand} buchen. Bitte lesen Sie sie vor der Buchung: Mit Ihrer Buchung akzeptieren Sie sie. Zuletzt aktualisiert: 1. November 2026.",
+  "sections": [
+   {
+    "h": "1. Wer wir sind",
+    "html": "<p>{brand} („wir“, „uns“) plant und organisiert maßgeschneiderte Reisen. Diese Bedingungen bilden zusammen mit Ihrem Angebot und Ihrer Buchungsbestätigung Ihren Vertrag mit uns.</p><p>Anschrift: {address}</p><p>E-Mail: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "2. Wie eine Buchung zustande kommt",
+    "html": "<p>Jede Reise beginnt mit einer Anfrage. Danach senden wir Ihnen ein schriftliches Angebot mit Reiseverlauf, Preis und Leistungen. Die Preise auf dieser Website sind „ab“-Preise pro Person und dienen zur Orientierung; maßgeblich ist der in Ihrem Angebot schriftlich bestätigte Preis.</p><p>Ihre Buchung erfolgt, wenn Sie das Angebot schriftlich annehmen und die Anzahlung leisten; sie ist verbindlich, sobald wir Ihnen eine schriftliche Buchungsbestätigung senden. Die buchende Person muss mindestens 18 Jahre alt sein und akzeptiert diese Bedingungen im Namen aller Reisenden.</p>"
+   },
+   {
+    "h": "3. Anzahlung, Restzahlung und Preise",
+    "html": "<p>Bei der Buchung ist eine in Ihrem Angebot genannte Anzahlung fällig. Der Restbetrag ist zu dem in Ihrer Buchungsbestätigung genannten Termin fällig, in der Regel 60 Tage vor Abreise. Buchen Sie weniger als 60 Tage vor Abreise, ist der volle Preis bei Buchung fällig.</p><p>Wird der Restbetrag nicht fristgerecht gezahlt, können wir die Buchung als von Ihnen storniert behandeln und die unten genannten Stornogebühren berechnen.</p><p>Nach der Buchungsbestätigung erhöhen wir den Preis nicht, es sei denn, von Dritten erhobene Steuern, Park- oder Eintrittsgebühren oder Treibstoffkosten ändern sich. Wir informieren Sie so früh wie möglich und erläutern die Berechnung. Beträgt die Erhöhung mehr als 8 % des Reisepreises, können Sie kostenlos zurücktreten und erhalten alle Zahlungen zurück.</p>"
+   },
+   {
+    "h": "4. Leistungen",
+    "html": "<p>Ihr Angebot und Ihre Buchungsbestätigung führen genau auf, was enthalten ist, in der Regel Unterkunft, Transport, Transfers und Aktivitäten laut Reiseverlauf sowie die genannten Mahlzeiten.</p><p>Sofern nicht anders angegeben, sind internationale Flüge, Reiseversicherung, Visa, Impfungen, Getränke, Trinkgelder, persönliche Ausgaben, optionale Aktivitäten und alles nicht als enthalten Genannte nicht im Preis inbegriffen.</p>"
+   },
+   {
+    "h": "5. Änderungen durch Sie",
+    "html": "<p>Möchten Sie Ihre Reise nach der Bestätigung ändern, teilen Sie uns dies schriftlich mit. Wir bemühen uns um die Änderung, je nach Verfügbarkeit. Sie tragen die Kosten der Leistungsträger und einen etwaigen Preisunterschied. Eine Änderung der Reisedaten oder eine größere Änderung kurz vor Abreise kann als Stornierung behandelt werden.</p><p>Sie können Ihre Buchung auf eine andere Person übertragen, die alle Reisebedingungen erfüllt, wenn Sie uns dies spätestens 14 Tage vor Abreise schriftlich mitteilen. Sie und diese Person haften gemeinsam für den Restbetrag und die durch die Übertragung entstehenden Mehrkosten.</p>"
+   },
+   {
+    "h": "6. Rücktritt durch Sie",
+    "html": "<p>Sie können jederzeit schriftlich zurücktreten; maßgeblich ist der Tag, an dem Ihre Erklärung bei uns eingeht. Sofern Ihre Buchungsbestätigung keine anderen Gebühren nennt, berechnen wir folgenden Anteil des Gesamtreisepreises:</p><ul><li>Mehr als 60 Tage vor Abreise: Verlust der Anzahlung</li><li>60 bis 31 Tage vor Abreise: 50 % des Reisepreises</li><li>30 bis 15 Tage vor Abreise: 75 % des Reisepreises</li><li>14 Tage oder weniger vor Abreise oder bei Nichtantritt: 100 % des Reisepreises</li></ul><p>Einige Leistungen wie Flüge, Genehmigungen und manche Aufenthalte in der Hauptsaison sind nach der Buchung nicht erstattungsfähig; Ihr Angebot weist darauf hin. Ihre Reiseversicherung kann Stornokosten abdecken.</p>"
+   },
+   {
+    "h": "7. Änderungen und Absage durch uns",
+    "html": "<p>Wir planen sorgfältig, müssen aber gelegentlich Leistungen ändern. Bei geringfügigen Änderungen, etwa einem vergleichbaren Hotel oder einer anderen Route, informieren wir Sie so bald wie möglich. Müssen wir die Reise erheblich ändern oder absagen, informieren wir Sie umgehend; Sie können die Änderung annehmen, eine vergleichbare Alternative wählen oder zurücktreten und erhalten alle Zahlungen vollständig zurück.</p><p>Bei Abreisen mit Mindestteilnehmerzahl können wir absagen, wenn diese nicht erreicht wird; wir informieren Sie spätestens 45 Tage vor Abreise und erstatten alle Zahlungen.</p>"
+   },
+   {
+    "h": "8. Reiseversicherung",
+    "html": "<p>Eine Reiseversicherung ist Voraussetzung für die Buchung. Sie muss Reiserücktritt, medizinische Behandlung, Notfallevakuierung und Rücktransport sowie die Aktivitäten Ihres Reiseverlaufs abdecken. Bitte senden Sie uns die Policendaten vor der Abreise.</p>"
+   },
+   {
+    "h": "9. Pässe, Visa und Gesundheit",
+    "html": "<p>Sie sind selbst dafür verantwortlich, einen gültigen Reisepass, erforderliche Visa oder Einreisegenehmigungen sowie die für Ihre Reise nötigen Impfungen und Gesundheitsnachweise zu besitzen und die für Ihre Staatsangehörigkeit geltenden Regeln zu prüfen. Einreise- und Gesundheitsbestimmungen ändern sich; wir teilen unsere Informationen mit Ihnen, bitte prüfen Sie sie aber vor der Reise bei der zuständigen Botschaft, bei offiziellen Stellen und bei Ihrem Arzt.</p>"
+   },
+   {
+    "h": "10. Unsere Haftung",
+    "html": "<p>Wir sind dafür verantwortlich, die Leistungen Ihrer Buchungsbestätigung mit angemessener Sorgfalt zu organisieren. Wird ein Teil Ihrer Reise nicht wie vereinbart erbracht, informieren Sie bitte sofort den Leistungsträger und uns, damit wir Abhilfe schaffen können.</p><p>Wir haften nicht für Verluste, Schäden oder Verspätungen, die von Ihnen oder einem Mitreisenden, von einem an den vereinbarten Leistungen unbeteiligten Dritten oder durch unvermeidbare, außergewöhnliche Umstände außerhalb unserer Kontrolle verursacht werden. Soweit internationale Abkommen die Haftung eines Leistungsträgers begrenzen, etwa bei Flügen, ist unsere Haftung ebenso begrenzt. Außer bei Tod oder Körperverletzung durch unser Verschulden ist unsere Haftung auf den Gesamtreisepreis begrenzt. Zwingende Verbraucherrechte bleiben von diesen Bedingungen unberührt.</p>"
+   },
+   {
+    "h": "11. Ihr Verhalten",
+    "html": "<p>Bitte respektieren Sie Gesetze und Bräuche der besuchten Orte und folgen Sie den Sicherheitsanweisungen unserer Leistungsträger und Gastgeber sowie unseren angemessenen Anweisungen. Gefährdet oder stört Ihr Verhalten andere erheblich, können wir oder der Leistungsträger Ihre Reise ohne Erstattung beenden; daraus entstehende Kosten tragen Sie.</p>"
+   },
+   {
+    "h": "12. Beschwerden",
+    "html": "<p>Geht während Ihrer Reise etwas schief, informieren Sie bitte sofort den Leistungsträger und uns, damit wir es vor Ort beheben können. Wird es nicht gelöst, schreiben Sie uns innerhalb von 28 Tagen nach Ihrer Rückkehr eine E-Mail. Wir bestätigen Beschwerden innerhalb von 14 Tagen und antworten möglichst innerhalb von 28 Tagen vollständig.</p><p>E-Mail: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "13. Höhere Gewalt",
+    "html": "<p>Wir haften nicht für Nichterfüllung oder Verzögerungen aufgrund unvermeidbarer, außergewöhnlicher Umstände außerhalb unserer Kontrolle, deren Folgen sich auch bei aller Sorgfalt nicht hätten vermeiden lassen, etwa Krieg, Unruhen, Terrorismus, Naturkatastrophen, Epidemien, Unwetter, Streiks oder die Schließung von Flughäfen, Grenzen oder Parks. Verhindern solche Umstände die Reise wie gebucht, bieten wir Ihnen eine vergleichbare Alternative oder die Erstattung Ihrer Zahlungen an.</p>"
+   },
+   {
+    "h": "14. Datenschutz",
+    "html": "<p>Wir nutzen Ihre personenbezogenen Daten zur Organisation Ihrer Reise, wie in unserer Datenschutzerklärung erläutert.</p><p><a href=\"/privacy/\">Unsere Datenschutzerklärung lesen</a></p>"
+   },
+   {
+    "h": "15. Anwendbares Recht",
+    "html": "<p>Für diese Bedingungen und alle daraus entstehenden Streitigkeiten gilt das Recht der Seychellen; zuständig sind die Gerichte der Seychellen. Als Verbraucher können Sie auch vor den Gerichten Ihres Wohnsitzlandes klagen und behalten den Schutz der zwingenden Verbraucherschutzvorschriften dieses Landes.</p>"
+   },
+   {
+    "h": "16. Kontakt",
+    "html": "<p>Fragen zu diesen Bedingungen oder Ihrer Buchung:</p><p>E-Mail: <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ },
+ "cookies": {
+  "title": "Cookie-Richtlinie",
+  "intro": "Was die Website von {brand} in Ihrem Browser speichert und warum. Zuletzt aktualisiert: 1. November 2026.",
+  "sections": [
+   {
+    "h": "Was Cookies sind",
+    "html": "<p>Cookies sind kleine Textdateien, die eine Website in Ihrem Browser speichert. Ähnliche Technologien wie der lokale Speicher und der Sitzungsspeicher erlauben es einer Website, kleine Informationen in Ihrem Browser abzulegen. In dieser Richtlinie umfasst der Begriff „Cookies“ all diese Technologien.</p>"
+   },
+   {
+    "h": "Was diese Website verwendet",
+    "html": "<p>Diese Website setzt keine Cookies. Sie nutzt nur den unten aufgeführten Browserspeicher, der für Funktionen nötig ist, die Sie selbst verwenden.</p><div class=\"legal-table-wrap\"><table class=\"legal-table\"><thead><tr><th scope=\"col\">Name</th><th scope=\"col\">Zweck</th><th scope=\"col\">Speicherdauer</th><th scope=\"col\">Art</th></tr></thead><tbody><tr><td>plannerRoute</td><td>Übergibt die im Inselhopping-Planer erstellte Route an das Anfrageformular; wird beim Senden der Anfrage gelöscht</td><td>Bis Sie Ihren Browserspeicher löschen</td><td>Lokaler Speicher, notwendig</td></tr></tbody></table></div><p>Wir verwenden keine Analyse-, Werbe- oder Social-Media-Tracking-Cookies.</p>"
+   },
+   {
+    "h": "Einwilligung",
+    "html": "<p>Für notwendige Einträge ist keine Einwilligung erforderlich, weil die Website oder eine von Ihnen gewünschte Funktion ohne sie nicht funktioniert. Sollten wir je nicht notwendige Cookies einsetzen, etwa für Statistiken, holen wir vorher Ihre Einwilligung ein und aktualisieren diese Richtlinie.</p>"
+   },
+   {
+    "h": "Inhalte Dritter",
+    "html": "<ul><li>Diese Website wird von Vercel gehostet, das Ihre IP-Adresse in Serverprotokollen verarbeitet, um die Seiten auszuliefern. Vercel setzt auf dieser Website keine Cookies.</li><li>Einige Fotos werden von Bildservern Dritter ausgeliefert. Ihr Browser übermittelt dabei Ihre IP-Adresse, damit die Bilder geladen werden können; diese Server setzen auf dieser Website keine Cookies.</li><li>Unsere Schriftarten werden von dieser Website selbst ausgeliefert; kein Schriftanbieter erhält Ihre Daten.</li><li>Wir binden keine Karten, Videos, Social-Media-Plugins oder Werbung ein.</li></ul>"
+   },
+   {
+    "h": "Cookies verwalten oder deaktivieren",
+    "html": "<p>Sie können Cookies und Website-Daten jederzeit in Ihren Browsereinstellungen ansehen und löschen oder ganz blockieren. Suchen Sie in den Datenschutzeinstellungen von Chrome, Firefox, Safari oder Edge nach „Cookies“ oder „Website-Daten“; die Hilfeseiten des jeweiligen Browsers erklären die Schritte.</p><p>Wenn Sie den Speicher blockieren, funktioniert die Website weiterhin, aber der Planer übergibt Ihre Route nicht an das Formular.</p>"
+   },
+   {
+    "h": "Änderungen dieser Richtlinie",
+    "html": "<p>Wir aktualisieren diese Richtlinie, wenn sich der Einsatz von Cookies auf dieser Website ändert. Das Datum oben zeigt die aktuelle Fassung.</p>"
+   },
+   {
+    "h": "Kontakt",
+    "html": "<p>Fragen zu dieser Richtlinie:</p><p>E-Mail: <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ }
+};
 
+const DOC_ES = {
+ "privacy": {
+  "title": "Política de privacidad",
+  "intro": "Cómo {brand} recoge, utiliza y protege sus datos personales cuando visita este sitio, nos envía una consulta o reserva un viaje. Última actualización: 1 de noviembre de 2026.",
+  "sections": [
+   {
+    "h": "Quiénes somos",
+    "html": "<p>{brand} diseña y organiza viajes a medida. Somos el responsable del tratamiento de los datos personales descritos en esta política.</p><p>Dirección: {address}</p><p>Correo electrónico: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "Qué datos recogemos",
+    "html": "<ul><li>Datos de la consulta: lo que introduce en nuestro formulario de consulta o nos envía por correo electrónico, como su nombre, dirección de correo electrónico, fechas de viaje, número de viajeros, intereses, presupuesto y su mensaje.</li><li>Datos de reserva: cuando reserva, lo que necesitamos para organizar su viaje, como los nombres completos de los viajeros tal como figuran en el pasaporte, fechas de nacimiento, nacionalidad, datos de llegada y salida, necesidades alimentarias y, solo si decide compartirlas, necesidades de salud o de movilidad.</li><li>Correspondencia: los correos electrónicos y mensajes que intercambia con nosotros.</li><li>Datos técnicos: cuando visita el sitio, nuestro proveedor de alojamiento registra automáticamente registros de servidor con su dirección IP, el tipo de navegador, las páginas solicitadas y la fecha y hora. Solo se usan para que el sitio funcione de forma segura y para corregir errores.</li><li>Almacenamiento en el navegador: los pequeños elementos descritos en nuestra política de cookies.</li></ul><p>No recogemos datos de tarjetas de pago a través de este sitio, y el sitio no utiliza herramientas de analítica ni rastreadores publicitarios.</p>"
+   },
+   {
+    "h": "Para qué los usamos y con qué base jurídica",
+    "html": "<ul><li>Responder a su consulta y preparar una propuesta: medidas precontractuales adoptadas a petición suya, y nuestro interés legítimo en responder a quienes se ponen en contacto con nosotros.</li><li>Reservar y llevar a cabo su viaje, incluida la comunicación de los datos necesarios a los proveedores que lo prestan: ejecución de nuestro contrato con usted.</li><li>Tener en cuenta la información de salud o movilidad que decida compartir: su consentimiento explícito, que puede retirar en cualquier momento.</li><li>Mantener el sitio seguro y en funcionamiento, y atender reclamaciones o acciones legales: nuestros intereses legítimos.</li><li>Llevar los registros contables y fiscales: cumplimiento de nuestras obligaciones legales.</li><li>Enviarle novedades, solo si nos lo ha pedido: su consentimiento, que puede retirar en cualquier momento.</li></ul><p>Nunca vendemos sus datos personales ni los utilizamos para decisiones automatizadas o elaboración de perfiles.</p>"
+   },
+   {
+    "h": "Con quién los compartimos",
+    "html": "<ul><li>Vercel Inc., que aloja este sitio y trata los registros técnicos descritos más arriba.</li><li>Nuestro proveedor de correo electrónico, que almacena y entrega los mensajes que intercambiamos con usted.</li><li>Los proveedores que prestan su viaje, como hoteles, lodges y campamentos, empresas de transporte y traslados, aerolíneas, proveedores de actividades y autoridades de parques o de permisos. Cada uno recibe solo lo que necesita para su reserva.</li><li>Asesores profesionales, autoridades públicas o tribunales, cuando la ley lo exija o para formular o defender reclamaciones.</li></ul><p>Al enviar el formulario de consulta se abre su propio programa de correo con el mensaje listo para enviárnoslo, de modo que el formulario no transmite sus datos a ningún tercero.</p><p>Nuestros proveedores actúan siguiendo nuestras instrucciones y deben mantener sus datos seguros y confidenciales.</p>"
+   },
+   {
+    "h": "Transferencias internacionales",
+    "html": "<p>Vercel y algunos de nuestros otros proveedores pueden tratar datos en Estados Unidos y en otros países. Su viaje tiene lugar en Seychelles, por lo que los proveedores locales reciben los datos que necesitan. Cuando la normativa de protección de datos lo exige, nos basamos en decisiones de adecuación, cláusulas contractuales tipo o garantías equivalentes, o en que la transferencia es necesaria para ejecutar el contrato que nos ha solicitado. Puede pedirnos información sobre estas garantías.</p>"
+   },
+   {
+    "h": "Cuánto tiempo los conservamos",
+    "html": "<ul><li>Consultas que no dan lugar a una reserva: hasta dos años después de nuestro último contacto.</li><li>Registros de reservas: el tiempo que exija la normativa fiscal y contable, normalmente hasta siete años después de su viaje.</li><li>Datos de salud o movilidad: se eliminan al terminar su viaje, salvo que nos pida conservarlos para un viaje futuro.</li><li>Registros de servidor: nuestro proveedor de alojamiento los conserva durante un periodo breve, normalmente no más de 30 días.</li></ul>"
+   },
+   {
+    "h": "Cómo los protegemos",
+    "html": "<p>Conservamos los datos personales en sistemas con acceso restringido, utilizamos conexiones cifradas (HTTPS) en este sitio y solo compartimos datos como se describe aquí. Si una brecha afecta a sus datos y pone en riesgo sus derechos, se lo comunicaremos sin dilación indebida.</p>"
+   },
+   {
+    "h": "Sus derechos",
+    "html": "<p>Según su lugar de residencia, tiene derecho a:</p><ul><li>acceder a los datos personales que tenemos sobre usted;</li><li>que se corrijan los datos inexactos (rectificación);</li><li>que se supriman sus datos (supresión);</li><li>limitar el uso de sus datos (limitación);</li><li>recibir sus datos en un formato portable o que se transmitan a otra persona (portabilidad);</li><li>oponerse al uso de sus datos basado en intereses legítimos y, en cualquier momento, al marketing directo (oposición);</li><li>retirar su consentimiento en cualquier momento, sin que ello afecte al tratamiento anterior;</li><li>presentar una reclamación ante una autoridad de control de protección de datos, en particular en el país donde vive o trabaja.</li></ul><p>Para ejercer cualquiera de estos derechos, escríbanos por correo electrónico. Respondemos en el plazo de un mes.</p><p>Correo electrónico: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "Cookies",
+    "html": "<p>Este sitio solo utiliza el almacenamiento en el navegador descrito en nuestra política de cookies.</p><p><a href=\"/cookies/\">Leer nuestra política de cookies</a></p>"
+   },
+   {
+    "h": "Menores",
+    "html": "<p>Este sitio no está dirigido a menores y no recogemos a sabiendas datos de menores de 16 años. Solo tratamos datos de menores que viajan con su familia cuando un progenitor o tutor nos los facilita para una reserva.</p>"
+   },
+   {
+    "h": "Cambios en esta política",
+    "html": "<p>Podemos actualizar esta política cuando cambien nuestros servicios o la ley. La fecha de arriba indica la última actualización.</p>"
+   },
+   {
+    "h": "Contacto",
+    "html": "<p>Si tiene preguntas sobre esta política o sus datos personales, escriba a {brand} a la dirección indicada arriba o por correo electrónico.</p><p>Correo electrónico: <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ },
+ "terms": {
+  "title": "Condiciones de reserva",
+  "intro": "Las condiciones que se aplican cuando reserva un viaje con {brand}. Léalas antes de reservar: al confirmar una reserva, las acepta. Última actualización: 1 de noviembre de 2026.",
+  "sections": [
+   {
+    "h": "1. Quiénes somos",
+    "html": "<p>{brand} («nosotros») diseña y organiza viajes a medida. Estas condiciones, junto con su propuesta y su confirmación de reserva, constituyen su contrato con nosotros.</p><p>Dirección: {address}</p><p>Correo electrónico: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "2. Cómo se hace y se confirma una reserva",
+    "html": "<p>Cada viaje empieza con una consulta. Después le enviamos una propuesta por escrito con el itinerario, el precio y lo que incluye. Los precios de este sitio son precios «desde» por persona, a título orientativo; su precio final es el confirmado por escrito en su propuesta.</p><p>Su reserva se realiza cuando acepta la propuesta por escrito y abona el depósito, y queda confirmada cuando le enviamos una confirmación de reserva por escrito. La persona que reserva debe tener al menos 18 años y acepta estas condiciones en nombre de todos los viajeros.</p>"
+   },
+   {
+    "h": "3. Depósito, pago final y precios",
+    "html": "<p>Al reservar se abona un depósito, indicado en su propuesta. El resto se paga en la fecha que figura en su confirmación de reserva, normalmente 60 días antes de la salida. Si reserva con menos de 60 días de antelación, el precio completo se abona al reservar.</p><p>Si el pago final no se realiza a tiempo, podemos considerar la reserva cancelada por usted y aplicar los gastos de cancelación indicados más abajo.</p><p>Una vez confirmada su reserva no aumentaremos el precio, salvo que cambien impuestos, tasas de parques o de entrada o costes de combustible impuestos por terceros. Se lo comunicaremos lo antes posible y le explicaremos el cálculo. Si el aumento supera el 8 % del precio del viaje, puede cancelar y recibir el reembolso íntegro.</p>"
+   },
+   {
+    "h": "4. Qué incluye",
+    "html": "<p>Su propuesta y su confirmación de reserva detallan exactamente lo que incluye, normalmente el alojamiento, el transporte, los traslados y las actividades de su itinerario, y las comidas indicadas.</p><p>Salvo que se indique lo contrario, el precio no incluye vuelos internacionales, seguro de viaje, visados, vacunas, bebidas, propinas, gastos personales, actividades opcionales ni nada que no figure como incluido.</p>"
+   },
+   {
+    "h": "5. Cambios por su parte",
+    "html": "<p>Si desea cambiar su viaje una vez confirmado, comuníquenoslo por escrito. Haremos todo lo posible por realizar el cambio, según disponibilidad. Usted asume los gastos que cobren los proveedores y cualquier diferencia de precio. Un cambio de fechas, o un cambio importante poco antes de la salida, puede tratarse como una cancelación.</p><p>Puede ceder su reserva a otra persona que cumpla todas las condiciones del viaje avisándonos por escrito al menos 14 días antes de la salida. Usted y esa persona responden solidariamente del importe pendiente y de los gastos adicionales que cause la cesión.</p>"
+   },
+   {
+    "h": "6. Cancelación por su parte",
+    "html": "<p>Puede cancelar en cualquier momento por escrito; la cancelación surte efecto el día en que la recibimos. Salvo que su confirmación de reserva indique otros gastos, cobramos la siguiente parte del precio total del viaje:</p><ul><li>Más de 60 días antes de la salida: pérdida del depósito</li><li>De 60 a 31 días antes de la salida: 50 % del precio del viaje</li><li>De 30 a 15 días antes de la salida: 75 % del precio del viaje</li><li>14 días o menos antes de la salida, o si no se presenta: 100 % del precio del viaje</li></ul><p>Algunos elementos, como vuelos, permisos y ciertas estancias en temporada alta, no son reembolsables una vez reservados; su propuesta lo indica cuando corresponde. Su seguro de viaje puede cubrir los gastos de cancelación.</p>"
+   },
+   {
+    "h": "7. Cambios y cancelación por nuestra parte",
+    "html": "<p>Planificamos con cuidado, pero a veces tenemos que cambiar algún servicio. Si el cambio es menor, como un hotel equivalente o una ruta distinta, se lo comunicaremos lo antes posible. Si tenemos que hacer un cambio importante o cancelar su viaje, se lo diremos de inmediato y podrá aceptar el cambio, elegir una alternativa comparable o cancelar y recibir el reembolso íntegro de todo lo que nos haya pagado.</p><p>En las salidas con un número mínimo de viajeros, podemos cancelar si no se alcanza, avisándole al menos 45 días antes de la salida y reembolsándole todo lo pagado.</p>"
+   },
+   {
+    "h": "8. Seguro de viaje",
+    "html": "<p>El seguro de viaje es obligatorio para reservar. Su póliza debe cubrir la cancelación, la asistencia médica, la evacuación de emergencia y la repatriación, así como las actividades de su itinerario. Envíenos los datos de la póliza antes de viajar.</p>"
+   },
+   {
+    "h": "9. Pasaportes, visados y salud",
+    "html": "<p>Usted es responsable de tener un pasaporte válido, los visados o permisos de entrada y las vacunas y documentos sanitarios que exija su viaje, y de comprobar las normas aplicables a su nacionalidad. Las normas de entrada y sanitarias cambian; compartimos la información de que disponemos, pero confírmela con la embajada correspondiente, fuentes oficiales y su médico antes de viajar.</p>"
+   },
+   {
+    "h": "10. Nuestra responsabilidad",
+    "html": "<p>Somos responsables de organizar los servicios de su confirmación de reserva con la diligencia debida. Si alguna parte de su viaje no se presta como se acordó, avise de inmediato al proveedor y a nosotros para que podamos intentar solucionarlo.</p><p>No somos responsables de pérdidas, daños o retrasos causados por usted o un miembro de su grupo, por un tercero ajeno a los servicios contratados o por circunstancias inusuales e imprevisibles ajenas a nuestro control. Cuando los convenios internacionales limitan la responsabilidad de un proveedor, por ejemplo en los vuelos, nuestra responsabilidad se limita del mismo modo. Salvo en caso de muerte o lesiones causadas por nuestra negligencia, nuestra responsabilidad se limita al precio total de su viaje. Nada en estas condiciones limita los derechos irrenunciables que le otorga la normativa de consumo.</p>"
+   },
+   {
+    "h": "11. Su comportamiento",
+    "html": "<p>Respete las leyes y costumbres de los lugares que visite, siga las instrucciones de seguridad de nuestros proveedores y anfitriones locales y nuestras indicaciones razonables. Si su comportamiento pone en peligro o molesta gravemente a otras personas, nosotros o el proveedor podemos poner fin a su viaje sin reembolso, y usted asumirá los gastos que se deriven.</p>"
+   },
+   {
+    "h": "12. Reclamaciones",
+    "html": "<p>Si algo va mal durante su viaje, avise de inmediato al proveedor y a nosotros para que intentemos resolverlo sobre el terreno. Si no se resuelve, escríbanos por correo electrónico en los 28 días siguientes a su regreso. Acusamos recibo de las reclamaciones en 14 días y procuramos responder por completo en 28 días.</p><p>Correo electrónico: <a href=\"mailto:{email}\">{email}</a></p>"
+   },
+   {
+    "h": "13. Fuerza mayor",
+    "html": "<p>No respondemos de incumplimientos o retrasos causados por circunstancias inusuales e imprevisibles ajenas a nuestro control cuyas consecuencias no habrían podido evitarse ni con toda la diligencia debida, como guerras, disturbios, terrorismo, catástrofes naturales, epidemias, fenómenos meteorológicos graves, huelgas o el cierre de aeropuertos, fronteras o parques. Si estas circunstancias impiden que su viaje se realice como se reservó, le ofreceremos una alternativa comparable o el reembolso de lo que nos haya pagado.</p>"
+   },
+   {
+    "h": "14. Protección de datos",
+    "html": "<p>Utilizamos sus datos personales para organizar su viaje, como se explica en nuestra política de privacidad.</p><p><a href=\"/privacy/\">Leer nuestra política de privacidad</a></p>"
+   },
+   {
+    "h": "15. Ley aplicable",
+    "html": "<p>Estas condiciones, y cualquier litigio derivado de ellas, se rigen por la ley de Seychelles, y son competentes los tribunales de Seychelles. Si es usted consumidor, también puede acudir a los tribunales del país donde reside y conserva la protección de las normas imperativas de consumo de ese país.</p>"
+   },
+   {
+    "h": "16. Contacto",
+    "html": "<p>Preguntas sobre estas condiciones o su reserva:</p><p>Correo electrónico: <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ },
+ "cookies": {
+  "title": "Política de cookies",
+  "intro": "Qué guarda el sitio web de {brand} en su navegador y por qué. Última actualización: 1 de noviembre de 2026.",
+  "sections": [
+   {
+    "h": "Qué son las cookies",
+    "html": "<p>Las cookies son pequeños archivos de texto que un sitio web guarda en su navegador. Tecnologías similares, como el almacenamiento local y el de sesión, permiten a un sitio guardar pequeños datos en su navegador. En esta política, «cookies» se refiere a todas ellas.</p>"
+   },
+   {
+    "h": "Qué utiliza este sitio",
+    "html": "<p>Este sitio no instala cookies. Solo utiliza el almacenamiento en el navegador que se indica a continuación, necesario para funciones que usted decide utilizar.</p><div class=\"legal-table-wrap\"><table class=\"legal-table\"><thead><tr><th scope=\"col\">Nombre</th><th scope=\"col\">Finalidad</th><th scope=\"col\">Duración</th><th scope=\"col\">Tipo</th></tr></thead><tbody><tr><td>plannerRoute</td><td>Lleva la ruta creada en el planificador de islas al formulario de consulta; se borra al enviar la consulta</td><td>Hasta que borre los datos de su navegador</td><td>Almacenamiento local, esencial</td></tr></tbody></table></div><p>No utilizamos cookies de analítica, publicidad ni seguimiento de redes sociales.</p>"
+   },
+   {
+    "h": "Consentimiento",
+    "html": "<p>Los elementos esenciales no requieren su consentimiento, porque el sitio, o una función que usted solicita, no puede funcionar sin ellos. Si alguna vez añadimos cookies no esenciales, como las de analítica, le pediremos antes su consentimiento y actualizaremos esta política.</p>"
+   },
+   {
+    "h": "Contenido de terceros",
+    "html": "<ul><li>Este sitio está alojado en Vercel, que trata su dirección IP en sus registros de servidor para servir las páginas. Vercel no instala cookies en este sitio.</li><li>Algunas fotografías se sirven desde servidores de imágenes de terceros. Su navegador les envía su dirección IP para recibir las imágenes; no instalan cookies en este sitio.</li><li>Nuestras fuentes tipográficas se sirven desde este sitio, por lo que ningún proveedor de fuentes recibe sus datos.</li><li>No insertamos mapas, vídeos, módulos de redes sociales ni publicidad.</li></ul>"
+   },
+   {
+    "h": "Cómo gestionar o desactivar las cookies",
+    "html": "<p>Puede ver y eliminar las cookies y los datos de sitios en cualquier momento desde la configuración de su navegador, o bloquearlos por completo. Busque «cookies» o «datos de sitios» en la configuración de privacidad de Chrome, Firefox, Safari o Edge; la ayuda de cada navegador explica los pasos.</p><p>Si bloquea el almacenamiento, el sitio sigue funcionando, pero el planificador no pasará su ruta al formulario.</p>"
+   },
+   {
+    "h": "Cambios en esta política",
+    "html": "<p>Actualizaremos esta política si cambia el uso de cookies en este sitio. La fecha de arriba indica la versión más reciente.</p>"
+   },
+   {
+    "h": "Contacto",
+    "html": "<p>Preguntas sobre esta política:</p><p>Correo electrónico: <a href=\"mailto:{email}\">{email}</a></p>"
+   }
+  ]
+ }
+};
 
-/**
- * Version française des pages légales : politique de confidentialité, conditions de réservation,
- * politique cookies. Même signature que legalPages() (legal.js) ; les textes `purpose`/`duration`
- * de `storage` et les phrases passées en option doivent déjà être en français.
- */
-/**
- * @param {LegalOptions} options
- * @returns {{ privacy: LegalDoc, terms: LegalDoc, cookies: LegalDoc }}
- */
-function legalPagesFr({ brand, email, address, updated, storage = [], enquiryNote = '', processors = [], thirdParty = 'Les polices et les images sont servies depuis le domaine de ce site : aucun service tiers ne dépose de cookie pendant votre visite.' }) {
-  const mail = `<a href="mailto:${email}">${email}</a>`;
-  const list = (items) => `<ul>${items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
-
-  const privacy = {
-    title: 'Politique de confidentialité',
-    intro: `Cette politique explique quelles données personnelles ${brand} recueille lorsque vous utilisez ce site ou préparez un voyage avec nous, pourquoi, et quels sont vos choix. Dernière mise à jour : ${updated}.`,
-    sections: [
-      { h: 'Qui sommes-nous', html: `<p>${brand} conçoit des voyages sur mesure. Au sens de la réglementation sur la protection des données, nous sommes responsables du traitement des données décrites ici. Vous pouvez nous écrire à ${mail} ou par courrier à l’adresse ${address}.</p>` },
-      { h: 'Ce que nous recueillons', html: list([
-        '<strong>Les informations de votre demande</strong> : nom, adresse e-mail, numéro de téléphone si vous choisissez de le donner, dates de voyage, nombre et âge des voyageurs, centres d’intérêt, budget et toute autre précision.',
-        '<strong>Nos échanges</strong> : les e-mails et messages échangés pendant la préparation du voyage.',
-        '<strong>Les informations de réservation</strong>, si vous donnez suite : noms, dates de naissance, données de passeport, besoins alimentaires ou médicaux et contacts d’urgence dont les prestataires ont besoin pour assurer votre voyage.',
-        '<strong>Des données techniques</strong> : notre hébergeur conserve des journaux serveur standard (adresse IP, type de navigateur, pages demandées, heure) pour assurer la sécurité et le bon fonctionnement du site.',
-      ]) },
-      { h: 'À quoi elles servent', html: list([
-        'Répondre à votre demande et préparer une proposition (mesures précontractuelles prises à votre demande).',
-        'Réserver et organiser votre voyage auprès des hébergements, guides, chauffeurs, compagnies aériennes et autres prestataires (exécution du contrat).',
-        'Respecter nos obligations légales, fiscales et comptables (obligation légale).',
-        'Sécuriser le site et corriger les problèmes (notre intérêt légitime).',
-      ]) + '<p>Nous ne vendons pas vos données, nous ne les utilisons pas pour de la publicité ciblée et nous ne vous envoyons de nouvelles par e-mail que si vous l’avez demandé.</p>' },
-      { h: 'Données de santé et autres données sensibles', html: '<p>Si vous nous signalez un problème de santé, un besoin lié à la mobilité ou un régime alimentaire, nous n’utilisons ces informations que pour adapter le voyage et ne les transmettons qu’aux prestataires concernés. Nous recueillons votre consentement à ce moment-là, et vous pouvez le retirer à tout moment.</p>' },
-      { h: 'Avec qui nous les partageons', html: '<p>Nous ne partageons vos données que lorsque c’est nécessaire :</p>' + list([
-        'avec les prestataires qui assurent votre voyage (hébergement, transport, guides, activités), dont certains se trouvent hors de votre pays ;',
-        ...processors,
-        'avec nos conseils, nos assureurs ou les autorités lorsque la loi l’exige.',
-      ]) + '<p>Lorsque des données sont transférées vers un autre pays, nous nous appuyons sur les garanties prévues par la loi applicable, ou le transfert est nécessaire à l’exécution du voyage que vous avez demandé.</p>' },
-      { h: 'Durée de conservation', html: '<p>Les demandes qui n’aboutissent pas à une réservation sont supprimées dans les deux ans suivant notre dernier échange. Les dossiers de réservation sont conservés le temps exigé par le droit fiscal et le droit de la consommation (en général jusqu’à sept ans après le voyage), puis supprimés.</p>' },
-      { h: 'Vos droits', html: `<p>Selon votre lieu de résidence, vous pouvez nous demander l’accès à vos données, leur rectification, leur effacement, la limitation du traitement ou vous y opposer, demander leur portabilité, et retirer votre consentement à tout moment. Écrivez à ${mail} : nous répondons sous un mois. Vous pouvez aussi saisir l’autorité de protection des données de votre pays.</p>` },
-      { h: 'Sécurité', html: '<p>Le site est servi en HTTPS. Seules les personnes qui préparent votre voyage ont accès aux informations de demande et de réservation.</p>' },
-      { h: 'Cookies', html: '<p>Voir notre <a href="COOKIES_URL">politique cookies</a> pour le peu de stockage utilisé par ce site dans votre navigateur.</p>' },
-      { h: 'Modifications', html: '<p>Si nous modifions cette politique, nous mettrons à jour la date indiquée en haut de cette page.</p>' },
-    ],
-  };
-
-  const terms = {
-    title: 'Conditions de réservation',
-    intro: `Ces conditions s’appliquent lorsque vous préparez et réservez un voyage sur mesure avec ${brand}. Merci de les lire avant de confirmer une réservation. Dernière mise à jour : ${updated}.`,
-    sections: [
-      { h: 'Notre façon de travailler', html: `<p>${brand} conçoit chaque voyage autour de ses voyageurs. Tout commence par une demande : vous nous dites ce que vous cherchez et nous préparons une proposition. Rien sur ce site n’est une offre de vente d’un produit figé, et aucune réservation n’existe tant que nous ne l’avons pas confirmée tous les deux par écrit.</p>` },
-      { h: 'Demandes et propositions', html: '<p>Une demande est gratuite et ne vous engage à rien. Nos propositions décrivent l’itinéraire, ce qui est inclus et le prix pour vos dates et votre groupe. Les prix dépendent des disponibilités et des tarifs des prestataires : une proposition est donc valable pendant la durée qui y est indiquée. Tant que la réservation n’est pas confirmée, prix et disponibilités peuvent changer.</p>' },
-      { h: 'Confirmer une réservation', html: '<p>Pour réserver, vous acceptez la proposition par écrit et versez l’acompte qui y figure. La réservation est confirmée lorsque nous vous envoyons une confirmation écrite. La personne qui réserve accepte ces conditions pour l’ensemble des voyageurs et doit être majeure.</p>' },
-      { h: 'Acompte et solde', html: '<p>Le montant de l’acompte et la date d’échéance du solde figurent sur votre proposition et votre confirmation, car ils dépendent des prestataires concernés. Certains éléments (vols, certains lodges ou permis) doivent parfois être payés en totalité dès la réservation ; nous vous le dirons avant tout engagement. Si le solde n’est pas réglé à l’échéance, nous pouvons considérer que vous avez annulé, et les frais d’annulation ci-dessous s’appliquent.</p>' },
-      { h: 'Modifications à votre demande', html: '<p>Nous ferons notre possible pour apporter les modifications demandées après confirmation, mais ce n’est pas toujours possible. Les frais supplémentaires facturés par les prestataires, ainsi que des frais de dossier raisonnables annoncés à l’avance, sont à votre charge. Un changement de dates peut être traité comme une annulation suivie d’une nouvelle réservation.</p>' },
-      { h: 'Si vous annulez', html: '<p>Vous pouvez annuler à tout moment, par écrit. Comme nous réglons les prestataires pour votre compte, des frais d’annulation s’appliquent. Ils figurent sur votre confirmation et augmentent à l’approche du départ ; ils ne dépassent jamais le prix total du voyage. Votre assurance voyage peut les couvrir dans certains cas.</p>' },
-      { h: 'Si nous modifions ou annulons', html: '<p>Nous devons rarement modifier un voyage confirmé, mais il arrive qu’un prestataire le fasse. Si un élément important de votre voyage doit changer, nous vous prévenons dès que possible et vous proposons une solution équivalente ou le remboursement intégral des sommes versées pour les prestations concernées. Nous n’annulons pas un voyage confirmé, sauf s’il ne peut pas avoir lieu en sécurité ou légalement (consignes officielles aux voyageurs, catastrophe naturelle ou événement comparable indépendant de notre volonté) ou en cas de non-paiement. Dans ces cas, nous remboursons les sommes versées pour les prestations qui n’ont pas lieu.</p>' },
-      { h: 'Assurance voyage', html: '<p>Une assurance voyage complète est une condition de réservation. Elle doit couvrir l’annulation, les frais médicaux, le rapatriement et les activités prévues au programme. Merci de nous transmettre les références de votre contrat avant le départ.</p>' },
-      { h: 'Passeports, visas et santé', html: '<p>Il vous appartient de disposer d’un passeport valide, des visas et autorisations d’entrée nécessaires, et de respecter les exigences sanitaires et vaccinales de chaque pays du voyage. Nous pouvons vous orienter vers les sources officielles, mais les règles changent et la responsabilité finale vous revient. Consultez un médecin bien avant le départ.</p>' },
-      { h: 'Pendant le voyage', html: '<p>Merci de suivre les consignes raisonnables des guides et des prestataires, de respecter les lois et usages locaux, et de nous prévenir immédiatement si quelque chose ne va pas, pour que nous puissions y remédier sur place.</p>' },
-      { h: 'Notre responsabilité', html: '<p>Nous choisissons nos prestataires et préparons votre voyage avec soin, et nous sommes responsables des prestations que nous nous engageons à fournir. Nous ne sommes pas responsables des pertes, dommages ou blessures causés par vous-même, par un tiers étranger au voyage, ou par des événements indépendants de notre volonté qui ne pouvaient être ni prévus ni évités. Lorsque des conventions internationales limitent l’indemnisation due par les transporteurs aériens, ferroviaires ou maritimes ou par les hôtels, notre responsabilité est limitée de la même façon. Rien dans ces conditions ne limite une responsabilité que la loi interdit de limiter, notamment en cas de décès ou de dommage corporel causé par notre négligence.</p>' },
-      { h: 'Réclamations', html: `<p>En cas de problème pendant le voyage, prévenez votre guide ou le prestataire et contactez-nous aussitôt pour que nous puissions agir sur place. Si vous n’êtes toujours pas satisfait, écrivez-nous à ${mail} dans les 28 jours suivant votre retour : nous vous répondrons dans les meilleurs délais.</p>` },
-      { h: 'Droit applicable', html: '<p>Ces conditions sont régies par la loi applicable au contrat conclu entre vous et nous. Elles ne portent pas atteinte à vos droits de consommateur, y compris le droit de saisir les tribunaux de votre lieu de résidence.</p>' },
-      { h: 'Contact', html: `<p>${brand}, ${address}. E-mail : ${mail}.</p>` },
-    ],
-  };
-
-  const table = storage.length
-    ? `<div class="legal-table"><table><thead><tr><th scope="col">Nom</th><th scope="col">Type</th><th scope="col">Finalité</th><th scope="col">Durée</th></tr></thead><tbody>${storage
-        .map((s) => `<tr><td><code>${s.name}</code></td><td>${s.kind}</td><td>${s.purpose}</td><td>${s.duration}</td></tr>`)
-        .join('')}</tbody></table></div>`
-    : '';
-  const cookies = {
-    title: 'Politique cookies',
-    intro: `Cette page liste tous les cookies et tout le stockage navigateur utilisés par ce site. Dernière mise à jour : ${updated}.`,
-    sections: [
-      { h: 'Ce que nous utilisons', html: storage.length
-        ? `<p>Ce site ne dépose aucun cookie publicitaire ou de suivi et n’utilise aucun outil de mesure d’audience. Il n’utilise que les éléments suivants, tous strictement nécessaires aux fonctions que vous utilisez :</p>${table}`
-        : '<p>Ce site ne dépose aucun cookie et n’utilise aucun stockage navigateur. Il n’utilise aucun outil de mesure d’audience, de publicité ou de suivi.</p>' },
-      { h: 'Services tiers', html: `<p>${enquiryNote ? enquiryNote + ' ' : ''}${thirdParty}</p>` },
-      { h: 'Consentement', html: storage.length
-        ? '<p>Les éléments ci-dessus étant strictement nécessaires à une fonction que vous choisissez d’utiliser, la loi ne nous impose pas de recueillir votre consentement au préalable : il n’y a donc pas de bandeau cookies. Si nous ajoutons un jour un outil de mesure d’audience ou tout autre élément non strictement nécessaire, nous vous demanderons votre accord avant son activation et mettrons cette page à jour.</p>'
-        : '<p>Rien n’étant stocké sur votre appareil, il n’y a rien à accepter et pas de bandeau cookies. Si nous ajoutons un jour un outil de mesure d’audience ou tout autre élément non strictement nécessaire, nous vous demanderons votre accord avant son activation et mettrons cette page à jour.</p>' },
-      { h: 'Supprimer ou bloquer', html: '<p>Vous pouvez à tout moment supprimer les cookies et les données de site dans les réglages de votre navigateur (rubrique Confidentialité ou Paramètres des sites), et les bloquer pour ce site. Le site continuera de fonctionner ; les fonctions qui utilisent le stockage local oublieront simplement votre progression.</p>' },
-      { h: 'Contact', html: `<p>Pour toute question sur cette politique : ${mail}.</p>` },
-    ],
-  };
-  return { privacy, terms, cookies };
-}
-
-
-/**
- * Deutsche Fassung der Rechtstexte: Datenschutzerklärung, Buchungsbedingungen, Cookie-Richtlinie.
- * Gleiche Signatur wie legalPages(); Texte in `storage` und die Optionen müssen bereits auf Deutsch sein.
- */
-/**
- * @param {LegalOptions} options
- * @returns {{ privacy: LegalDoc, terms: LegalDoc, cookies: LegalDoc }}
- */
-function legalPagesDe({ brand, email, address, updated, storage = [], enquiryNote = '', processors = [], thirdParty = 'Schriften und Bilder werden von der eigenen Domain dieser Website geladen; kein Drittanbieter setzt beim Besuch Cookies.' }) {
-  const mail = `<a href="mailto:${email}">${email}</a>`;
-  const list = (items) => `<ul>${items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
-
-  const privacy = {
-    title: 'Datenschutzerklärung',
-    intro: `Diese Erklärung beschreibt, welche personenbezogenen Daten ${brand} erhebt, wenn Sie diese Website nutzen oder eine Reise mit uns planen, warum wir sie erheben und welche Wahlmöglichkeiten Sie haben. Stand: ${updated}.`,
-    sections: [
-      { h: 'Wer wir sind', html: `<p>${brand} plant maßgeschneiderte Reisen. Im Sinne des Datenschutzrechts sind wir Verantwortliche für die hier beschriebenen Daten. Sie erreichen uns unter ${mail} oder per Post unter ${address}.</p>` },
-      { h: 'Welche Daten wir erheben', html: list([
-        '<strong>Angaben aus Ihrer Anfrage</strong>: Name, E-Mail-Adresse, Telefonnummer (falls Sie sie angeben), Reisedaten, Zahl und Alter der Reisenden, Interessen, Budgetrahmen und weitere Hinweise.',
-        '<strong>Korrespondenz</strong>: die E-Mails und Nachrichten, die wir bei der Planung Ihrer Reise austauschen.',
-        '<strong>Buchungsdaten</strong>, wenn Sie buchen: Namen, Geburtsdaten, Passdaten, Ernährungs- oder medizinische Bedürfnisse und Notfallkontakte, die Leistungsträger für die Durchführung Ihrer Reise benötigen.',
-        '<strong>Technische Daten</strong>: Unser Hosting-Anbieter speichert übliche Server-Logs (IP-Adresse, Browsertyp, aufgerufene Seiten, Uhrzeit), um die Website sicher und funktionsfähig zu halten.',
-      ]) },
-      { h: 'Wofür wir sie nutzen', html: list([
-        'Um Ihre Anfrage zu beantworten und ein Angebot zu erstellen (vorvertragliche Maßnahmen auf Ihre Anfrage).',
-        'Um Ihre Reise bei Unterkünften, Guides, Fahrern, Fluggesellschaften und anderen Leistungsträgern zu buchen und durchzuführen (Vertragserfüllung).',
-        'Um gesetzliche, steuerliche und buchhalterische Pflichten zu erfüllen (rechtliche Verpflichtung).',
-        'Um die Website zu schützen und Fehler zu beheben (berechtigtes Interesse).',
-      ]) + '<p>Wir verkaufen Ihre Daten nicht, erstellen keine Werbeprofile und senden Ihnen Neuigkeiten per E-Mail nur, wenn Sie das ausdrücklich wünschen.</p>' },
-      { h: 'Gesundheitsdaten und andere sensible Daten', html: '<p>Wenn Sie uns eine Erkrankung, einen Mobilitätsbedarf oder eine Ernährungsform mitteilen, nutzen wir diese Angaben nur, um die Reise für Sie passend zu machen, und geben sie nur an die Leistungsträger weiter, die sie benötigen. Wir holen dafür Ihre Einwilligung ein, die Sie jederzeit widerrufen können.</p>' },
-      { h: 'An wen wir Daten weitergeben', html: '<p>Wir geben personenbezogene Daten nur weiter, wenn es nötig ist:</p>' + list([
-        'an die Leistungsträger, die Ihre Reise durchführen (Unterkünfte, Transport, Guides, Aktivitäten), von denen sich einige außerhalb Ihres Landes befinden;',
-        ...processors,
-        'an Berater, Versicherer oder Behörden, wenn das Gesetz es verlangt.',
-      ]) + '<p>Werden Daten in ein anderes Land übermittelt, stützen wir uns auf die nach geltendem Recht vorgesehenen Garantien, oder die Übermittlung ist zur Durchführung der von Ihnen gewünschten Reise erforderlich.</p>' },
-      { h: 'Wie lange wir Daten speichern', html: '<p>Anfragen, aus denen keine Buchung wird, löschen wir spätestens zwei Jahre nach dem letzten Kontakt. Buchungsunterlagen bewahren wir so lange auf, wie Steuer- und Verbraucherrecht es verlangen (in der Regel bis zu sieben Jahre nach der Reise), und löschen sie danach.</p>' },
-      { h: 'Ihre Rechte', html: `<p>Je nach Wohnort können Sie Auskunft über Ihre Daten verlangen, sie berichtigen oder löschen lassen, die Verarbeitung einschränken oder ihr widersprechen, Ihre Daten übertragen lassen und erteilte Einwilligungen jederzeit widerrufen. Schreiben Sie an ${mail}; wir antworten innerhalb eines Monats. Sie haben außerdem das Recht, sich bei der Datenschutzaufsichtsbehörde Ihres Landes zu beschweren.</p>` },
-      { h: 'Sicherheit', html: '<p>Die Website wird über HTTPS ausgeliefert. Zugriff auf Anfrage- und Buchungsdaten haben nur die Personen, die Ihre Reise planen.</p>' },
-      { h: 'Cookies', html: '<p>In unserer <a href="COOKIES_URL">Cookie-Richtlinie</a> lesen Sie, welchen geringen Browserspeicher diese Website nutzt.</p>' },
-      { h: 'Änderungen', html: '<p>Wenn wir diese Erklärung ändern, aktualisieren wir das Datum oben auf dieser Seite.</p>' },
-    ],
-  };
-
-  const terms = {
-    title: 'Buchungsbedingungen',
-    intro: `Diese Bedingungen gelten, wenn Sie mit ${brand} eine maßgeschneiderte Reise planen und buchen. Bitte lesen Sie sie, bevor Sie eine Buchung bestätigen. Stand: ${updated}.`,
-    sections: [
-      { h: 'So arbeiten wir', html: `<p>${brand} gestaltet jede Reise rund um die Reisenden. Alles beginnt mit einer Anfrage: Sie sagen uns, was Sie suchen, und wir erstellen ein Angebot. Nichts auf dieser Website ist ein Angebot zum Verkauf eines festen Produkts, und eine Buchung kommt erst zustande, wenn wir sie beide schriftlich bestätigt haben.</p>` },
-      { h: 'Anfragen und Angebote', html: '<p>Eine Anfrage ist kostenlos und unverbindlich. Unsere Angebote beschreiben die Route, die enthaltenen Leistungen und den Preis für Ihre Daten und Ihre Gruppe. Preise hängen von Verfügbarkeit und Tarifen der Leistungsträger ab; ein Angebot gilt daher für den darin genannten Zeitraum. Bis zur Bestätigung der Buchung können sich Preise und Verfügbarkeit ändern.</p>' },
-      { h: 'Bestätigung der Buchung', html: '<p>Um zu buchen, nehmen Sie das Angebot schriftlich an und leisten die darin genannte Anzahlung. Die Buchung ist bestätigt, sobald wir Ihnen eine schriftliche Bestätigung senden. Wer bucht, akzeptiert diese Bedingungen für alle Reisenden und muss mindestens 18 Jahre alt sein.</p>' },
-      { h: 'Anzahlung und Restzahlung', html: '<p>Höhe der Anzahlung und Fälligkeit der Restzahlung stehen in Ihrem Angebot und Ihrer Bestätigung, da sie von den beteiligten Leistungsträgern abhängen. Manche Leistungen (etwa Flüge, bestimmte Lodges oder Genehmigungen) müssen bei Buchung vollständig bezahlt werden; das sagen wir Ihnen, bevor Sie sich festlegen. Wird die Restzahlung nicht fristgerecht geleistet, können wir die Buchung als von Ihnen storniert behandeln; dann gelten die unten genannten Stornokosten.</p>' },
-      { h: 'Änderungen auf Ihren Wunsch', html: '<p>Wir bemühen uns, gewünschte Änderungen nach der Bestätigung umzusetzen, doch das ist nicht immer möglich. Zusätzliche Kosten der Leistungsträger sowie eine angemessene Bearbeitungsgebühr, die wir vorher nennen, tragen Sie. Eine Änderung der Reisedaten kann als Stornierung mit anschließender Neubuchung behandelt werden.</p>' },
-      { h: 'Wenn Sie stornieren', html: '<p>Sie können jederzeit schriftlich stornieren. Da wir Leistungsträger in Ihrem Auftrag bezahlen, fallen Stornokosten an. Sie stehen in Ihrer Bestätigung und steigen, je näher der Reisebeginn rückt; sie übersteigen nie den Gesamtpreis der Reise. Ihre Reiseversicherung kann diese Kosten unter Umständen übernehmen.</p>' },
-      { h: 'Wenn wir ändern oder absagen', html: '<p>Wir müssen eine bestätigte Reise nur selten ändern, Leistungsträger tun es jedoch gelegentlich. Muss ein wesentlicher Teil Ihrer Reise geändert werden, informieren wir Sie so schnell wie möglich und bieten Ihnen eine gleichwertige Alternative oder die volle Erstattung der für die betroffenen Leistungen gezahlten Beträge an. Eine bestätigte Reise sagen wir nur ab, wenn sie nicht sicher oder rechtmäßig stattfinden kann (etwa wegen offizieller Reisewarnungen, Naturkatastrophen oder ähnlicher Ereignisse außerhalb unserer Kontrolle) oder wenn nicht gezahlt wurde. In diesen Fällen erstatten wir, was Sie für die ausfallenden Leistungen gezahlt haben.</p>' },
-      { h: 'Reiseversicherung', html: '<p>Eine umfassende Reiseversicherung ist Voraussetzung für die Buchung. Sie sollte Reiserücktritt, medizinische Behandlung, Rücktransport und alle Aktivitäten Ihrer Route abdecken. Bitte senden Sie uns die Policendaten vor der Abreise.</p>' },
-      { h: 'Pass, Visum und Gesundheit', html: '<p>Für einen gültigen Reisepass, Visa und Einreisegenehmigungen sowie die Einhaltung der Gesundheits- und Impfvorschriften aller Länder Ihrer Reise sind Sie selbst verantwortlich. Gern verweisen wir Sie auf offizielle Quellen, doch die Regeln ändern sich, und die Verantwortung liegt letztlich bei Ihnen. Holen Sie rechtzeitig vor der Reise ärztlichen Rat ein.</p>' },
-      { h: 'Während der Reise', html: '<p>Bitte folgen Sie den angemessenen Anweisungen von Guides und Leistungsträgern, respektieren Sie die örtlichen Gesetze und Gebräuche und sagen Sie uns sofort Bescheid, wenn etwas nicht stimmt, damit wir es vor Ort beheben können.</p>' },
-      { h: 'Unsere Haftung', html: '<p>Wir wählen Leistungsträger sorgfältig aus, planen Ihre Reise mit Sorgfalt und haften für die Leistungen, die wir zu erbringen zusagen. Wir haften nicht für Verluste, Verletzungen oder Schäden, die Sie selbst, ein nicht an der Reise beteiligter Dritter oder unvorhersehbare und unvermeidbare Ereignisse außerhalb unserer Kontrolle verursachen. Wo internationale Übereinkommen die Haftung von Luft-, Bahn- oder Schiffsbeförderern oder Hotels begrenzen, ist unsere Haftung in gleicher Weise begrenzt. Nichts in diesen Bedingungen beschränkt eine Haftung, die gesetzlich nicht beschränkt werden kann, insbesondere für Tod oder Körperverletzung durch unsere Fahrlässigkeit.</p>' },
-      { h: 'Beschwerden', html: `<p>Wenn während der Reise etwas schiefgeht, sagen Sie es Ihrem Guide oder dem Leistungsträger und kontaktieren Sie uns sofort, damit wir noch vor Ort helfen können. Sind Sie danach noch unzufrieden, schreiben Sie uns innerhalb von 28 Tagen nach Ihrer Rückkehr an ${mail}; wir antworten so schnell wie möglich.</p>` },
-      { h: 'Anwendbares Recht', html: '<p>Diese Bedingungen unterliegen dem Recht, das auf den Vertrag zwischen Ihnen und uns anwendbar ist. Ihre gesetzlichen Verbraucherrechte, einschließlich des Rechts, vor den Gerichten Ihres Wohnorts zu klagen, bleiben unberührt.</p>' },
-      { h: 'Kontakt', html: `<p>${brand}, ${address}. E-Mail: ${mail}.</p>` },
-    ],
-  };
-
-  const table = storage.length
-    ? `<div class="legal-table"><table><thead><tr><th scope="col">Name</th><th scope="col">Art</th><th scope="col">Zweck</th><th scope="col">Dauer</th></tr></thead><tbody>${storage
-        .map((s) => `<tr><td><code>${s.name}</code></td><td>${s.kind}</td><td>${s.purpose}</td><td>${s.duration}</td></tr>`)
-        .join('')}</tbody></table></div>`
-    : '';
-  const cookies = {
-    title: 'Cookie-Richtlinie',
-    intro: `Diese Seite listet alle Cookies und jeden Browserspeicher auf, den diese Website verwendet. Stand: ${updated}.`,
-    sections: [
-      { h: 'Was wir verwenden', html: storage.length
-        ? `<p>Diese Website setzt keine Werbe- oder Tracking-Cookies und nutzt keine Webanalyse. Sie verwendet ausschließlich Folgendes, jeweils unbedingt erforderlich für Funktionen, die Sie nutzen:</p>${table}`
-        : '<p>Diese Website setzt keine Cookies und nutzt keinen Browserspeicher. Sie verwendet keine Analyse-, Werbe- oder Tracking-Skripte.</p>' },
-      { h: 'Drittanbieter', html: `<p>${enquiryNote ? enquiryNote + ' ' : ''}${thirdParty}</p>` },
-      { h: 'Einwilligung', html: storage.length
-        ? '<p>Da alles oben Genannte für eine von Ihnen gewählte Funktion unbedingt erforderlich ist, müssen wir dafür keine vorherige Einwilligung einholen; deshalb gibt es kein Cookie-Banner. Sollten wir künftig Webanalyse oder andere nicht unbedingt erforderliche Dienste einsetzen, bitten wir vorher um Ihre Einwilligung und aktualisieren diese Seite.</p>'
-        : '<p>Da nichts auf Ihrem Gerät gespeichert wird, gibt es nichts einzuwilligen und kein Cookie-Banner. Sollten wir künftig Webanalyse oder andere nicht unbedingt erforderliche Dienste einsetzen, bitten wir vorher um Ihre Einwilligung und aktualisieren diese Seite.</p>' },
-      { h: 'Löschen oder blockieren', html: '<p>Sie können Cookies und Websitedaten jederzeit in den Einstellungen Ihres Browsers löschen (meist unter Datenschutz oder Website-Einstellungen) und für diese Website blockieren. Die Website funktioniert weiterhin; Funktionen, die den lokalen Speicher nutzen, vergessen lediglich Ihren Fortschritt.</p>' },
-      { h: 'Kontakt', html: `<p>Fragen zu dieser Richtlinie: ${mail}.</p>` },
-    ],
-  };
-  return { privacy, terms, cookies };
-}
-
-
-/**
- * Versión en español de las páginas legales: política de privacidad, condiciones de reserva y política de cookies.
- * Misma firma que legalPages(); los textos de `storage` y las opciones deben estar ya en español.
- */
-/**
- * @param {LegalOptions} options
- * @returns {{ privacy: LegalDoc, terms: LegalDoc, cookies: LegalDoc }}
- */
-function legalPagesEs({ brand, email, address, updated, storage = [], enquiryNote = '', processors = [], thirdParty = 'Las fuentes y las imágenes se sirven desde el propio dominio de este sitio, así que ningún servicio externo instala cookies durante su visita.' }) {
-  const mail = `<a href="mailto:${email}">${email}</a>`;
-  const list = (items) => `<ul>${items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
-
-  const privacy = {
-    title: 'Política de privacidad',
-    intro: `Esta política explica qué datos personales recoge ${brand} cuando usted utiliza este sitio web o planea un viaje con nosotros, por qué los recogemos y qué opciones tiene. Última actualización: ${updated}.`,
-    sections: [
-      { h: 'Quiénes somos', html: `<p>${brand} diseña viajes a medida. A efectos de la normativa de protección de datos, somos responsables del tratamiento de los datos descritos aquí. Puede escribirnos a ${mail} o por correo postal a ${address}.</p>` },
-      { h: 'Qué datos recogemos', html: list([
-        '<strong>Los datos de su solicitud</strong>: nombre, correo electrónico, teléfono si decide indicarlo, fechas de viaje, número y edad de los viajeros, intereses, presupuesto y cualquier otra indicación.',
-        '<strong>Nuestra correspondencia</strong>: los correos y mensajes que intercambiamos mientras preparamos su viaje.',
-        '<strong>Los datos de la reserva</strong>, si sigue adelante: nombres, fechas de nacimiento, datos del pasaporte, necesidades alimentarias o médicas y contactos de emergencia que los proveedores necesitan para prestar los servicios.',
-        '<strong>Datos técnicos</strong>: nuestro proveedor de alojamiento web conserva registros estándar del servidor (dirección IP, tipo de navegador, páginas solicitadas, hora) para mantener el sitio seguro y en funcionamiento.',
-      ]) },
-      { h: 'Para qué los usamos', html: list([
-        'Para responder a su solicitud y preparar una propuesta (medidas precontractuales a petición suya).',
-        'Para reservar y organizar su viaje con alojamientos, guías, conductores, aerolíneas y otros proveedores (ejecución del contrato).',
-        'Para cumplir nuestras obligaciones legales, fiscales y contables (obligación legal).',
-        'Para mantener el sitio seguro y corregir problemas (nuestro interés legítimo).',
-      ]) + '<p>No vendemos sus datos, no los usamos para crear perfiles publicitarios y solo le enviamos novedades por correo si nos lo ha pedido.</p>' },
-      { h: 'Datos de salud y otros datos sensibles', html: '<p>Si nos informa de una afección médica, una necesidad de movilidad o una dieta especial, usamos esa información solo para adaptar el viaje y la compartimos únicamente con los proveedores que la necesitan. Le pedimos su consentimiento al recogerla, y puede retirarlo en cualquier momento.</p>' },
-      { h: 'Con quién los compartimos', html: '<p>Solo compartimos datos personales cuando es necesario:</p>' + list([
-        'con los proveedores que prestan los servicios de su viaje (alojamiento, transporte, guías, actividades), algunos de ellos fuera de su país;',
-        ...processors,
-        'con asesores profesionales, aseguradoras o autoridades cuando la ley lo exige.',
-      ]) + '<p>Cuando los datos se transfieren a otro país, nos basamos en las garantías previstas por la legislación aplicable, o la transferencia es necesaria para prestar el viaje que usted ha solicitado.</p>' },
-      { h: 'Cuánto tiempo los conservamos', html: '<p>Las solicitudes que no terminan en reserva se eliminan en un plazo de dos años desde nuestro último contacto. Los expedientes de reserva se conservan el tiempo que exige la normativa fiscal y de consumo (normalmente hasta siete años después del viaje) y después se eliminan.</p>' },
-      { h: 'Sus derechos', html: `<p>Según dónde resida, puede pedirnos acceso a sus datos, su rectificación o supresión, la limitación del tratamiento u oponerse a él, la portabilidad de sus datos, y retirar su consentimiento en cualquier momento. Escriba a ${mail} y le responderemos en el plazo de un mes. También tiene derecho a reclamar ante la autoridad de protección de datos de su país.</p>` },
-      { h: 'Seguridad', html: '<p>El sitio se sirve mediante HTTPS. Solo las personas que preparan su viaje tienen acceso a los datos de solicitudes y reservas.</p>' },
-      { h: 'Cookies', html: '<p>Consulte nuestra <a href="COOKIES_URL">política de cookies</a> para conocer el poco almacenamiento del navegador que utiliza este sitio.</p>' },
-      { h: 'Cambios', html: '<p>Si modificamos esta política, actualizaremos la fecha que figura al principio de esta página.</p>' },
-    ],
-  };
-
-  const terms = {
-    title: 'Condiciones de reserva',
-    intro: `Estas condiciones se aplican cuando planea y reserva un viaje a medida con ${brand}. Léalas antes de confirmar una reserva. Última actualización: ${updated}.`,
-    sections: [
-      { h: 'Cómo trabajamos', html: `<p>${brand} diseña cada viaje en torno a sus viajeros. Todo empieza con una solicitud: usted nos cuenta lo que busca y preparamos una propuesta. Nada de lo que aparece en este sitio es una oferta de venta de un producto cerrado, y no existe ninguna reserva hasta que ambas partes la hayamos confirmado por escrito.</p>` },
-      { h: 'Solicitudes y propuestas', html: '<p>Una solicitud es gratuita y no le compromete a nada. Nuestras propuestas describen el itinerario, lo que incluye y el precio para sus fechas y su grupo. Los precios dependen de la disponibilidad y de las tarifas de los proveedores, por lo que cada propuesta es válida durante el plazo que en ella se indica. Hasta que la reserva esté confirmada, precios y disponibilidad pueden cambiar.</p>' },
-      { h: 'Confirmar una reserva', html: '<p>Para reservar, acepte la propuesta por escrito y abone el depósito indicado en ella. La reserva queda confirmada cuando le enviamos una confirmación por escrito. Quien realiza la reserva acepta estas condiciones en nombre de todos los viajeros y debe ser mayor de edad.</p>' },
-      { h: 'Depósito y pago final', html: '<p>El importe del depósito y la fecha de pago del resto figuran en su propuesta y en su confirmación, ya que dependen de los proveedores implicados. Algunos servicios (vuelos, ciertos lodges o permisos) pueden requerir el pago completo al reservar; se lo diremos antes de que se comprometa. Si el pago final no se realiza en plazo, podremos considerar la reserva cancelada por usted y se aplicarán los gastos de cancelación indicados más abajo.</p>' },
-      { h: 'Cambios a petición suya', html: '<p>Intentaremos atender cualquier cambio que nos pida tras la confirmación, aunque no siempre es posible. Los costes adicionales que cobren los proveedores, más unos gastos de gestión razonables que le comunicaremos antes, corren de su cuenta. Un cambio de fechas puede tratarse como una cancelación seguida de una nueva reserva.</p>' },
-      { h: 'Si usted cancela', html: '<p>Puede cancelar en cualquier momento por escrito. Como pagamos a los proveedores en su nombre, se aplican gastos de cancelación. Figuran en su confirmación y aumentan a medida que se acerca la salida; nunca superarán el precio total del viaje. Su seguro de viaje puede cubrirlos en algunos casos.</p>' },
-      { h: 'Si nosotros modificamos o cancelamos', html: '<p>Rara vez necesitamos modificar un viaje confirmado, pero a veces lo hacen los proveedores. Si una parte importante de su viaje debe cambiar, se lo comunicaremos cuanto antes y le ofreceremos una alternativa adecuada o el reembolso íntegro de lo pagado por los servicios afectados. No cancelaremos un viaje confirmado salvo que no pueda realizarse de forma segura o legal (por ejemplo, por recomendaciones oficiales de viaje, catástrofes naturales u otros hechos ajenos a nuestro control) o por falta de pago. En esos casos, le reembolsaremos lo pagado por los servicios que no se presten.</p>' },
-      { h: 'Seguro de viaje', html: '<p>Contratar un seguro de viaje completo es condición para reservar. Debe cubrir cancelación, asistencia médica, repatriación y las actividades previstas en su itinerario. Envíenos los datos de la póliza antes de viajar.</p>' },
-      { h: 'Pasaportes, visados y salud', html: '<p>Usted es responsable de tener un pasaporte válido, los visados y permisos de entrada necesarios, y de cumplir los requisitos sanitarios y de vacunación de cada país del itinerario. Con gusto le indicaremos las fuentes oficiales, pero las normas cambian y la responsabilidad final es suya. Consulte a su médico con tiempo antes de viajar.</p>' },
-      { h: 'Durante el viaje', html: '<p>Siga las indicaciones razonables de guías y proveedores, respete las leyes y costumbres locales y avísenos de inmediato si algo no va bien, para que podamos intentar solucionarlo sobre la marcha.</p>' },
-      { h: 'Nuestra responsabilidad', html: '<p>Elegimos a nuestros proveedores y preparamos su viaje con diligencia, y respondemos de los servicios que nos comprometemos a prestar. No respondemos de pérdidas, lesiones o daños causados por usted, por terceros ajenos al viaje o por hechos fuera de nuestro control que no pudieran preverse ni evitarse. Cuando los convenios internacionales limitan lo que deben pagar las compañías aéreas, ferroviarias o marítimas o los hoteles, nuestra responsabilidad se limita del mismo modo. Nada en estas condiciones limita la responsabilidad que la ley no permite limitar, incluida la derivada de muerte o lesiones personales causadas por nuestra negligencia.</p>' },
-      { h: 'Reclamaciones', html: `<p>Si surge un problema durante el viaje, comuníquelo a su guía o al proveedor y contacte con nosotros enseguida para que podamos actuar sobre el terreno. Si sigue sin estar satisfecho, escríbanos a ${mail} en los 28 días siguientes a su regreso y le responderemos lo antes posible.</p>` },
-      { h: 'Legislación aplicable', html: '<p>Estas condiciones se rigen por la ley aplicable al contrato entre usted y nosotros. Nada en ellas afecta a sus derechos como consumidor, incluido el derecho a acudir a los tribunales de su lugar de residencia.</p>' },
-      { h: 'Contacto', html: `<p>${brand}, ${address}. Correo electrónico: ${mail}.</p>` },
-    ],
-  };
-
-  const table = storage.length
-    ? `<div class="legal-table"><table><thead><tr><th scope="col">Nombre</th><th scope="col">Tipo</th><th scope="col">Finalidad</th><th scope="col">Duración</th></tr></thead><tbody>${storage
-        .map((s) => `<tr><td><code>${s.name}</code></td><td>${s.kind}</td><td>${s.purpose}</td><td>${s.duration}</td></tr>`)
-        .join('')}</tbody></table></div>`
-    : '';
-  const cookies = {
-    title: 'Política de cookies',
-    intro: `Esta página enumera todas las cookies y todo el almacenamiento del navegador que utiliza este sitio. Última actualización: ${updated}.`,
-    sections: [
-      { h: 'Qué utilizamos', html: storage.length
-        ? `<p>Este sitio no instala cookies publicitarias ni de seguimiento y no utiliza analítica. Solo usa lo siguiente, todo ello estrictamente necesario para funciones que usted utiliza:</p>${table}`
-        : '<p>Este sitio no instala cookies ni usa almacenamiento del navegador. No utiliza scripts de analítica, publicidad ni seguimiento.</p>' },
-      { h: 'Servicios de terceros', html: `<p>${enquiryNote ? enquiryNote + ' ' : ''}${thirdParty}</p>` },
-      { h: 'Consentimiento', html: storage.length
-        ? '<p>Como todo lo anterior es estrictamente necesario para una función que usted elige usar, la ley no nos obliga a pedir su consentimiento previo, y por eso no hay banner de cookies. Si algún día añadimos analítica u otro elemento que no sea estrictamente necesario, le pediremos su consentimiento antes de activarlo y actualizaremos esta página.</p>'
-        : '<p>Como no se guarda nada en su dispositivo, no hay nada que aceptar ni banner de cookies. Si algún día añadimos analítica u otro elemento que no sea estrictamente necesario, le pediremos su consentimiento antes de activarlo y actualizaremos esta página.</p>' },
-      { h: 'Cómo borrarlo o bloquearlo', html: '<p>Puede borrar las cookies y los datos del sitio en cualquier momento desde la configuración de su navegador (normalmente en Privacidad o Configuración de sitios) y bloquearlos para este sitio. El sitio seguirá funcionando; las funciones que usan el almacenamiento local simplemente olvidarán su progreso.</p>' },
-      { h: 'Contacto', html: `<p>Preguntas sobre esta política: ${mail}.</p>` },
-    ],
-  };
-  return { privacy, terms, cookies };
-}
-
+/** @returns {{ privacy: LegalDoc, terms: LegalDoc, cookies: LegalDoc }} */
+const legalPages = (o) => fill(DOC_EN, o);
+const legalPagesFr = (o) => fill(DOC_FR, o);
+const legalPagesDe = (o) => fill(DOC_DE, o);
+const legalPagesEs = (o) => fill(DOC_ES, o);
 
 const LEGAL = { en: legalPages, fr: legalPagesFr, de: legalPagesDe, es: legalPagesEs };
 module.exports = { legalPages, legalPagesFr, legalPagesDe, legalPagesEs, LEGAL };

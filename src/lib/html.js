@@ -125,6 +125,7 @@ ${heroPreload(body)}<link rel="preload" href="/assets/fonts/InstrumentSerif-400-
 <script>document.documentElement.className="js"</script>
 <style>:root{--font-display:${f.display};--font-text:${f.text};--font-mono:${f.mono}}</style>
 <link rel="stylesheet" href="/assets/css/site.css">
+${path === '/' ? `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'TravelAgency', name: config.brand.name, url: config.url, email: c.email, address: { '@type': 'PostalAddress', streetAddress: 'Blend Seychelles, Abis Center, Providence Industrial Estate', addressLocality: 'Mahé', addressCountry: 'SC' } }).replace(/</g, '\\u003c')}</script>` : ''}
 </head>
 <body${overlay ? ' class="has-overlay"' : ''}>
 <a class="skip" href="#main">Skip to content</a>
