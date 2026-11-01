@@ -116,7 +116,7 @@ ${pageHero({ eyebrow: 'Enquire', slot: 'anse-georgette', index: 1, label: 'Anse 
     </form>
     <div class="facts">
       <h2 class="facts-h">Prefer to talk?</h2>
-      <p><a href="mailto:${esc(config.contact.email)}">${esc(config.contact.email)}</a><br>${esc(config.contact.hours)}</p>
+      <p><a href="mailto:${esc(config.contact.email)}">${esc(config.contact.email)}</a><br>${esc(config.contact.address)}<br>${esc(config.contact.hours)}</p>
     </div>
   </div>
 </section>`;
