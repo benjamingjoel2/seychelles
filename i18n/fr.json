@@ -62,6 +62,7 @@
  "<a>Giant tortoises</a>": "<a>Tortues géantes</a>",
  "<a>Grand Anse (La Digue)</a>": "<a>Grand Anse (La Digue)</a>",
  "<a>Grand Anse (Praslin)</a>": "<a>Grand Anse (Praslin)</a>",
+ "<a>Granite Coast</a>": "<a>Granite Coast</a>",
  "<a>How we plan <span>": "<a>Notre façon de préparer <span>",
  "<a>Island-hopping planner</a>": "<a>Planificateur d’îles</a>",
  "<a>Islands</a>": "<a>Îles</a>",
@@ -95,6 +96,7 @@
  "<a>Visiting responsibly</a>": "<a>Voyager de façon responsable</a>",
  "<a>When to go</a>": "<a>Quand partir</a>",
  "<a>granitecoast@tourground.com</a>": "<a>granitecoast@tourground.com</a>",
+ "<a>granitecoast@tourground.com</a><br>Blend Seychelles, Abis Center, Providence Industrial Estate, Mahé, Seychelles<br>Mon–Fri, 09:00–17:00 Seychelles time (UTC+4)": "<a>granitecoast@tourground.com</a><br>Blend Seychelles, Abis Center, Providence Industrial Estate, Mahé, Seychelles<br>Du lundi au vendredi, 9 h–17 h, heure des Seychelles (UTC+4)",
  "<a>granitecoast@tourground.com</a><br>Mon–Fri, 09:00–17:00 Seychelles time (UTC+4)": "<a>granitecoast@tourground.com</a><br>Du lundi au vendredi, 9 h–17 h, heure des Seychelles (UTC+4)",
  "<abbr>Apr</abbr>": "<abbr>Avr</abbr>",
  "<abbr>Aug</abbr>": "<abbr>Août</abbr>",
@@ -393,6 +395,7 @@
  "Bird Island: illustration, photograph to come": "Bird Island : illustration, photo à venir",
  "Birds": "Oiseaux",
  "Birds and boulders": "Oiseaux et rochers",
+ "Blend Seychelles, Abis Center, Providence Industrial Estate, Mahé, Seychelles": "Blend Seychelles, Abis Center, Providence Industrial Estate, Mahé, Seychelles",
  "Boat": "Bateau",
  "Boat from Praslin (Côte d’Or or Anse Volbert), about 15–20 minutes. National park fee payable.": "Bateau depuis Praslin (Côte d’Or ou Anse Volbert), environ 15 à 20 minutes. Droit d’entrée au parc national.",
  "Boat transfer arranged by your accommodation; depends on sea state.": "Transfert en bateau organisé par votre hébergement ; selon l’état de la mer.",
@@ -972,7 +975,5 @@
  "← Praslin": "← Praslin",
  "← Silhouette": "← Silhouette",
  "← The outer islands": "← Les îles extérieures",
- "● calm · ◐ mixed · ○ rough": "● calme · ◐ variable · ○ agitée",
- "Blend Seychelles, Abis Center, Providence Industrial Estate, Mahé, Seychelles": "Blend Seychelles, Abis Center, Providence Industrial Estate, Mahé, Seychelles",
- "<a>granitecoast@tourground.com</a><br>Blend Seychelles, Abis Center, Providence Industrial Estate, Mahé, Seychelles<br>Mon–Fri, 09:00–17:00 Seychelles time (UTC+4)": "<a>granitecoast@tourground.com</a><br>Blend Seychelles, Abis Center, Providence Industrial Estate, Mahé, Seychelles<br>Du lundi au vendredi, 9 h–17 h, heure des Seychelles (UTC+4)"
+ "● calm · ◐ mixed · ○ rough": "● calme · ◐ variable · ○ agitée"
 }
