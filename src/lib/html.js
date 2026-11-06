@@ -21,7 +21,7 @@ const used = new Map();
 
 const two = (n) => String(n).padStart(2, '0');
 
-/** Arrow inside a circle, used on pill buttons and links. */
+/** Plain arrow glyph after a button or link label (no circle: owner rule, Nov 2026). */
 const arrow = (dir = 'right') =>
   `<span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12"><path d="${
     dir === 'up-right' ? 'M4 12 12 4M5.5 4H12v6.5' : 'M2 8h11M9 4l4 4-4 4'
@@ -147,41 +147,15 @@ ${path === '/' ? `<script type="application/ld+json">${JSON.stringify({ '@contex
 ${body}
 </main>
 <footer class="site-footer">
-  <div class="wrap">
-    <div class="footer-top">
-      <p class="footer-statement">${esc(config.brand.tagline)}.</p>
-      <a class="pill pill--light" href="/enquire/">Start planning ${arrow()}</a>
-    </div>
-    <div class="footer-grid">
-      <div>
-        <h2 class="label">Contact</h2>
-        <ul class="plain">
-          <li><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></li>
-          <li>${esc(c.address)}</li>
-          <li>${esc(c.hours)}</li>
-        </ul>
-      </div>
-      <div>
-        <h2 class="label">Explore</h2>
-        <ul class="plain">${NAV.map(([h, l]) => `<li><a href="${h}">${l}</a></li>`).join('')}</ul>
-      </div>
-      <div>
-        <h2 class="label">Plan</h2>
-        <ul class="plain">
-          <li><a href="/itineraries/#planner">Island-hopping planner</a></li>
-          <li><a href="/beaches/#finder">Calm beach finder</a></li>
-          <li><a href="/enquire/">Send an enquiry</a></li>
-          <li><a href="/privacy/">Privacy policy</a></li>
-          <li><a href="/booking-terms/">Booking terms</a></li>
-          <li><a href="/cookies/">Cookie policy</a></li>
-        </ul>
-      </div>
-    </div>
+  <div class="wrap footer-row">
+    <a class="footer-name" href="/">${esc(config.brand.name)}</a>
+    <nav class="footer-links" aria-label="Main"><ul>${NAV.map(([h, l]) => `<li><a href="${h}">${l}</a></li>`).join('')}<li><a href="/enquire/">Enquire</a></li></ul></nav>
+    <a class="footer-mail" href="mailto:${esc(c.email)}">${esc(c.email)}</a>
   </div>
-  <p class="footer-wordmark" aria-hidden="true">${esc(config.brand.name)}</p>
-  <div class="wrap footer-small">
-    <p>Travel times, fees and entry rules change: always check before you travel.</p>
+  <div class="wrap footer-row footer-row--small">
     <p>© ${new Date().getFullYear()} ${esc(config.brand.name)}</p>
+    <p>${esc(c.address)}</p>
+    <ul><li><a href="/privacy/">Privacy policy</a></li><li><a href="/booking-terms/">Booking terms</a></li><li><a href="/cookies/">Cookie policy</a></li></ul>
   </div>
 </footer>
 ${data ? `<script id="page-data" type="application/json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>` : ''}
