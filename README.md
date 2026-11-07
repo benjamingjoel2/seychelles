@@ -33,7 +33,7 @@ npm run check    # build, then check internal links, anchors, alt text and dupli
 | Planner legs, times and visiting order | `src/data/routes.js` |
 | Sample itineraries | `src/data/itineraries.js` |
 | Month-by-month notes | `src/data/months.js` |
-| Stays (currently placeholders) | `src/data/stays.js` |
+| Stays (described by place until partners are chosen) | `src/data/stays.js` |
 | Journal posts | `src/data/journal.js` (body is HTML) |
 | Photos | `src/data/photos.js` |
 | Page layouts | `src/pages/*.js`; shared header, footer and photo helper in `src/lib/html.js` |
@@ -71,8 +71,11 @@ added, it must be credited (bring back a credits page for those photos only).
 
 **Rule:** only add a photo when the location on its Unsplash or Pexels page names the place
 it is used for. Copy that text into `location`; it is shown in the caption.
-A slot without a photo shows a drawn granite-and-sea illustration rather than a photo of
-somewhere else. See `FACTS-TO-VERIFY.md` for the empty slots.
+Where Unsplash and Pexels have nothing for a place (Curieuse, Denis, Bird Island, Aldabra and
+some beaches), the photo comes from Wikimedia Commons (`W(...)` entries: CC0, public domain,
+CC BY or CC BY-SA, file title or description naming the place). `npm run photos` downloads and
+resizes those too (needs ImageMagick with WebP), and their caption carries the author and
+licence, as the licence requires. There are no drawings: a slot with no photo fails the build.
 
 ### Facts
 
@@ -101,7 +104,7 @@ review all three before launch.
 
 - Confirm the business address in `site.config.js` (`contact.address`): see the open question in the PR.
 - Set up the `granitecoast@tourground.com` mailbox and point `granitecoast.tourground.com` at the Vercel project.
-- Replace the placeholder stays and request images for them (`IMAGES-NEEDED.md`).
+- Name the real partner stays and request images for them (`IMAGES-NEEDED.md`).
 - Work through `FACTS-TO-VERIFY.md`, have a lawyer review the legal pages and native speakers the FR/DE/ES copy.
 
 ## Deploy

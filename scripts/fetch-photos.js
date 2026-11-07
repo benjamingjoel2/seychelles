@@ -7,6 +7,7 @@
  *   npm run photos
  *
  * Run it after adding a photo to src/data/photos.js, then commit the new files.
+ * Wikimedia Commons photos are resized locally and need ImageMagick (`convert`) with WebP support.
  */
 const fs = require('fs');
 const path = require('path');
@@ -14,6 +15,29 @@ const photos = require('../src/data/photos.js');
 
 const OUT = path.join(__dirname, '..', 'src', 'assets', 'photos');
 const WIDTHS = require('../src/lib/photo-widths.js');
+
+const { execFileSync } = require('child_process');
+const crypto = require('crypto');
+const UA = { 'User-Agent': 'granite-coast-site/1.0 (photo registry; benjamin@hyperportergroup.com)' };
+
+// Wikimedia Commons: fetch one large copy (1920px thumb, or the original if smaller), then resize
+// locally with ImageMagick to every width. Commons rate-limits busy addresses, so retry patiently.
+async function commons(p) {
+  const name = p.file.replace(/ /g, '_');
+  const h = crypto.createHash('md5').update(name).digest('hex');
+  const e = encodeURIComponent(name);
+  const base = `https://upload.wikimedia.org/wikipedia/commons/${h[0]}/${h.slice(0, 2)}/${e}`;
+  const thumb = `https://upload.wikimedia.org/wikipedia/commons/thumb/${h[0]}/${h.slice(0, 2)}/${e}/1920px-${e}`;
+  for (let i = 0; i < 40; i++) {
+    for (const u of [thumb, base]) {
+      const r = await fetch(u, { headers: UA });
+      if (r.ok) return Buffer.from(await r.arrayBuffer());
+      if (r.status === 429) break;
+    }
+    await new Promise((res) => setTimeout(res, 30000));
+  }
+  throw new Error(`Commons download failed for ${p.file}`);
+}
 
 const url = (p, w) =>
   p.source === 'pexels'
@@ -38,6 +62,22 @@ function webpSize(buf) {
   const all = [...new Map(Object.values(photos).flat().map((p) => [p.id, p])).values()];
   let got = 0, failed = 0;
   for (const p of all) {
+    if (p.source === 'wikimedia') {
+      if (WIDTHS.every((w) => fs.existsSync(path.join(OUT, `${p.id}-${w}.webp`)))) continue;
+      try {
+        const tmp = path.join(OUT, `${p.id}.orig`);
+        fs.writeFileSync(tmp, await commons(p));
+        for (const w of WIDTHS) {
+          execFileSync('convert', [tmp, '-auto-orient', '-strip', '-resize', `${w}x${w}>`, '-quality', '62', path.join(OUT, `${p.id}-${w}.webp`)]);
+          got++;
+        }
+        fs.rmSync(tmp);
+      } catch (e) {
+        failed++;
+        console.error(`Failed ${p.id} (${p.file}): ${e.message}`);
+      }
+      continue;
+    }
     for (const w of WIDTHS) {
       const file = path.join(OUT, `${p.id}-${w}.webp`);
       if (fs.existsSync(file)) continue;

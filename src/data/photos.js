@@ -1,10 +1,14 @@
 /**
  * Photos from Unsplash (P) and Pexels (X), keyed by the slot they illustrate.
  *
- * RULE: a photo is only added when the location shown on its own Unsplash/Pexels page
- * names the place it is used for. `location` records that text verbatim and is shown in
- * the caption. Slots with no entry render an illustration instead.
- * Images are hotlinked from the source's CDN and credited in the caption and on /credits/.
+ * Photos from Wikimedia Commons (W) fill places Unsplash and Pexels do not cover (Curieuse,
+ * Denis, Bird, Aldabra and some beaches): CC0, public domain, CC BY or CC BY-SA only.
+ *
+ * RULE: a photo is only added when the location shown on its own Unsplash/Pexels page (or the
+ * Commons file title/description) names the place it is used for. `location` records that text
+ * and is shown in the caption. Every slot the site renders must have a photo: there are no
+ * drawings, and a slot left empty fails the build.
+ * Images are self-hosted (scripts/fetch-photos.js) and credited in the caption.
  */
 const P = (slot, id, page, img, photographer, handle, location, alt) => ({
   source: 'unsplash', slot, id, page, img: `https://images.unsplash.com/${img}`, photographer,
@@ -13,6 +17,14 @@ const P = (slot, id, page, img, photographer, handle, location, alt) => ({
 // Pexels photos: pass full URLs. `img` is the images.pexels.com URL without a query string.
 const X = (slot, id, page, img, photographer, photographer_url, location, alt) => ({
   source: 'pexels', slot, id, page, img, photographer, photographer_url, location, alt,
+});
+
+// Wikimedia Commons photos: `file` is the Commons file name (no "File:" prefix); the licence
+// requires the author and licence in the caption.
+const W = (slot, file, photographer, license, location, alt) => ({
+  source: 'wikimedia', slot, id: `wm-${require('crypto').createHash('md5').update(file).digest('hex').slice(0, 10)}`,
+  file, page: `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(file.replace(/ /g, '_'))}`,
+  img: '', photographer, photographer_url: '', license, location, alt,
 });
 
 const list = [
@@ -79,6 +91,16 @@ const list = [
   P('anse-georgette', 'moQlf2Lcp7o', 'https://unsplash.com/photos/moQlf2Lcp7o', 'photo-1621328899619-8b01ea79d16f', 'Datingscout', 'datingscout', 'Point Millers - Anse Georgette, Praslin Island, Seychelles', 'Looking through vegetation down to the white beach at Anse Georgette'),
   P('beau-vallon', 'zjwuEar-5HQ', 'https://unsplash.com/photos/zjwuEar-5HQ', 'photo-1624964650973-c280337755c7', 'Datingscout', 'datingscout', 'Beau Vallon, Seychellen', 'Rocky shoreline and a clear tidal pool below a forested hillside near Beau Vallon'),
   P('outer-islands', '2CaHGbkCldU', 'https://unsplash.com/photos/2CaHGbkCldU', 'photo-1593427264975-018fa7ad748b', 'Dan Maisey', 'dwm12', 'Alphonse Island, Seychelles', 'An Aldabra giant tortoise in leafy shade on Alphonse Island'),
+  // Wikimedia Commons (no Unsplash/Pexels photo names these places).
+  W('curieuse', 'Anse Papaie with Sanctuaire des Tortues - Curieuse Island.jpg', 'NorbertNagel', 'CC BY-SA 4.0', 'Anse Papaie, Curieuse Island, Seychelles', 'Coconut palms over the beach at Anse Papaie on Curieuse, beside the green-roofed shelters of the giant tortoise sanctuary'),
+  W('bird-island', 'Bird flocks Bird Island Seychelles.jpg', 'Dino Sassi, Marcel Fayon', 'Public domain', 'Bird Island, Seychelles', 'Sooty terns in flight over their nesting ground on Bird Island'),
+  W('denis', 'Sunset on Denis Island (5130881717).jpg', 'Adrian Scottow', 'CC BY-SA 2.0', 'Denis Island, Seychelles', 'Sunset over the sea and the long beach on Denis Island'),
+  W('aldabra', 'Aldabra Atoll-108985.jpg', 'Ron Van Oers', 'CC BY-SA 3.0 IGO', 'Aldabra Atoll, Seychelles', 'Undercut coral-limestone shore and casuarina trees above the clear lagoon water at Aldabra Atoll'),
+  W('anse-takamaka', 'Aerial of Anse Takamaka beach Mahe Seychelles (39589907292).jpg', 'dronepicr', 'CC BY 2.0', 'Anse Takamaka, Mahé, Seychelles', 'The bay and beach at Anse Takamaka from above, with the green hills of southern Mahé behind'),
+  W('cote-d-or', 'Cote D\'Or Beach - Anse Volbert - Praslin - Seychelles.jpg', 'NorbertNagel', 'CC BY-SA 4.0', 'Côte d’Or, Anse Volbert, Praslin, Seychelles', 'A leaning coconut palm over the white sand at Côte d’Or, Praslin, with small boats moored in the turquoise bay'),
+  W('grand-anse-la-digue', 'Grand Anse La Digue 2015.JPG', 'Bjørn Christian Tørrissen', 'CC BY-SA 4.0', 'Grand Anse, La Digue, Seychelles', 'Grand Anse on La Digue from the hillside: a long curve of sand and surf between granite boulders and forest'),
+  W('anse-cocos', 'Anse Cocos-La Digue-Seychelles.jpg', 'Tobi 87', 'CC BY-SA 4.0', 'Anse Cocos, La Digue, Seychelles', 'Granite boulders at the end of the white sand at Anse Cocos, La Digue, with a palm’s shadow across the beach'),
+  W('anse-severe', 'Anse Severe - La Digue - Seychelles - 10.jpg', 'NorbertNagel', 'CC BY-SA 4.0', 'Anse Sévère, La Digue, Seychelles', 'Rounded granite rocks and clear water at the edge of the beach at Anse Sévère, La Digue'),
 ];
 
 const bySlot = {};

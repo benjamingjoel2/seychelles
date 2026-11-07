@@ -69,7 +69,16 @@ function build() {
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="8" fill="${config.palette.sand}"/><path d="M4 30c4-10 9-16 15-16 5 0 7 4 11 4 3 0 5-2 6-3v15H4z" fill="${config.palette.granite}"/><path d="M4 31c6-2 10 2 16 0s10-2 16 0v5H4z" fill="${config.palette.oceanBright}"/></svg>`);
 
   const pageModules = ['home', 'islands', 'beaches', 'nature', 'plan', 'misc', 'legal'];
+  globalThis.__photoMissing = new Set();
+  globalThis.__photoUsed = new Map();
   const pages = pageModules.flatMap((m) => freshRequire(path.join(SRC, 'pages', `${m}.js`))());
+
+  // Every photo slot must have a real photo (no drawings, no empty frames).
+  const missing = globalThis.__photoMissing;
+  const used = globalThis.__photoUsed;
+  if (missing.size) throw new Error(`No photo for: ${[...missing].join(', ')}. Add one to src/data/photos.js.`);
+  const notLocal = [...used.values()].filter((p) => p.source === 'wikimedia' && !fs.existsSync(path.join(SRC, 'assets', 'photos', `${p.id}-640.webp`)));
+  if (notLocal.length) throw new Error(`Wikimedia photos not downloaded: ${notLocal.map((p) => p.file).join(', ')}. Run npm run photos.`);
 
   for (const p of pages) {
     const file = p.path.endsWith('.html') ? path.join(DIST, p.path) : path.join(DIST, p.path, 'index.html');

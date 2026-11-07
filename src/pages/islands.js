@@ -95,7 +95,6 @@ ${isStays.length ? html`
 <section class="section">
   <div class="wrap">
     <h2>Places we would suggest</h2>
-    <p class="placeholder-note">Placeholder names: real partner stays will be listed here.</p>
     <ul class="stay-list">${isStays.map((s) => `<li><strong>${esc(s.name)}</strong> <span class="muted">${esc(s.type)} · ${esc(s.size)}</span><br>${esc(s.fit)}</li>`)}</ul>
     <p><a href="/stays/">All stays →</a></p>
   </div>

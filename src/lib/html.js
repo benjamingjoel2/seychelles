@@ -12,7 +12,7 @@ const html = (strings, ...vals) =>
 
 const utm = `utm_source=${encodeURIComponent(config.brand.name.toLowerCase().replace(/\s+/g, '_'))}&utm_medium=referral`;
 
-const SOURCE = { unsplash: 'Unsplash', pexels: 'Pexels' };
+const SOURCE = { unsplash: 'Unsplash', pexels: 'Pexels', wikimedia: 'Wikimedia Commons' };
 // Unsplash asks for referral parameters on credit links; Pexels links are left clean.
 const creditUrl = (p, url) => (p.source === 'unsplash' ? `${url}?${utm}` : url);
 
@@ -30,20 +30,23 @@ const arrow = (dir = 'right') =>
 /** Small uppercase monospace label, e.g. "(02) Islands". */
 const label = (text, n) => `<p class="label">${n != null ? `<span class="label-n">(${two(n)})</span> ` : ''}${esc(text)}</p>`;
 
+/** Slots rendered with no photo (the build fails if any), and Wikimedia photos used (must be self-hosted). */
+const missing = { add: (x) => globalThis.__photoMissing && globalThis.__photoMissing.add(x) };
+
 /**
- * Responsive photo with credit. If no location-verified photo exists for `slot`,
- * renders a drawn placeholder instead, never a photo of somewhere else.
+ * Responsive photo with credit. Only location-verified photos, never a photo of somewhere else.
  */
 function photo(slot, { index = 0, ratio = '3:2', sizes = '100vw', eager = false, cls = '', label: lbl = '', caption = true } = {}) {
   const list = photos[slot] || [];
   const p = list[index % (list.length || 1)];
   const [rw, rh] = ratio.split(':').map(Number);
   if (!p) {
-    return html`<figure class="photo photo--placeholder ${cls}">
-      <div class="placeholder-art" style="aspect-ratio:${rw}/${rh}" role="img" aria-label="${esc(lbl || slot)}: illustration, photograph to come"><span>${esc(lbl)}</span></div>
-    </figure>`;
+    // No photo for this slot: a plain colour block, never a drawing. The build fails on this (see build.js).
+    missing.add(lbl || slot);
+    return html`<figure class="photo photo--empty ${cls}" aria-hidden="true"><div style="aspect-ratio:${rw}/${rh}"></div></figure>`;
   }
   used.set(p.id, { ...p, slot });
+  if (globalThis.__photoUsed) globalThis.__photoUsed.set(p.id, p);
   // Self-hosted copies (see scripts/fetch-photos.js); fall back to the source CDN if missing.
   const local = PHOTO_WIDTHS.map((w) => [`${p.id}-${w}.webp`, w]).filter(([f]) => photoSizes[f]);
   const srcset = local.length
@@ -54,7 +57,7 @@ function photo(slot, { index = 0, ratio = '3:2', sizes = '100vw', eager = false,
     <img src="${fallback}" srcset="${srcset}" sizes="${sizes}"
       width="1200" height="${Math.round((1200 * rh) / rw)}" alt="${esc(p.alt)}"
       ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" style="aspect-ratio:${rw}/${rh}">
-    ${caption ? `<figcaption>${esc(p.location)}</figcaption>` : ''}
+    ${caption ? `<figcaption>${esc(p.location)}${p.source === 'wikimedia' ? ` · ${esc(p.photographer)} / Wikimedia Commons, ${esc(p.license)}` : ''}</figcaption>` : ''}
   </figure>`;
 }
 
@@ -186,4 +189,4 @@ function pageHero({ eyebrow, n, title, lede, slot, index = 0, label: lbl, ratio 
 const badge = (rating) =>
   `<span class="badge badge--${rating}">${{ calm: 'Calm', mixed: 'Mixed', rough: 'Rough' }[rating]}</span>`;
 
-module.exports = { esc, html, photo, hasPhoto, layout, pageHero, badge, used, config, utm, SOURCE, creditUrl, arrow, label, two };
+module.exports = { esc, html, photo, hasPhoto, layout, pageHero, badge, used, missing, config, utm, SOURCE, creditUrl, arrow, label, two };
