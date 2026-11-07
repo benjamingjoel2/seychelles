@@ -29,7 +29,7 @@ abbr[title]{text-decoration:none}
 
 /* ---------- Type ---------- */
 .display,.display-1,.display-2,.hero-title,.statement,h1,h2,h3{font-family:var(--font-display);font-weight:400;color:var(--ocean);letter-spacing:-.015em}
-h1,.display{font-size:clamp(2.6rem,6.4vw,6rem);line-height:.92;letter-spacing:-.025em}
+h1,.display{font-size:clamp(3rem,9vw,8.5rem);line-height:.92;letter-spacing:-.025em}
 .display-1{font-size:clamp(2.4rem,5.6vw,5.5rem);line-height:.95;letter-spacing:-.025em}
 h2,.display-2{font-size:clamp(2.3rem,5vw,4.4rem);line-height:.98;letter-spacing:-.02em;margin-bottom:.35em}
 h3{font-size:clamp(1.5rem,2.2vw,2rem);line-height:1.05;margin-bottom:.35em}
@@ -145,7 +145,7 @@ h3{font-size:clamp(1.5rem,2.2vw,2rem);line-height:1.05;margin-bottom:.35em}
 .hero-inner{position:relative;z-index:1;padding-top:2rem;padding-bottom:2rem}
 .hero-top{display:none}
 .hero .label{color:rgba(250,247,242,.85)}
-.hero-title{color:var(--sand);font-size:clamp(2.8rem,6.4vw,6rem);line-height:.88;letter-spacing:-.035em;margin:0 0 .35em;max-width:9em}
+.hero-title{color:var(--sand);font-size:clamp(3.4rem,11vw,10.5rem);line-height:.88;letter-spacing:-.035em;margin:0 0 .35em;max-width:9em}
 .hero-title em{color:var(--granite)}
 .hero-bottom{display:grid;gap:1.5rem}
 .hero-lede{font-size:clamp(1.05rem,1.4vw,1.25rem);line-height:1.5;max-width:32em;margin:0;color:rgba(250,247,242,.92)}
