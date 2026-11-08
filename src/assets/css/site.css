@@ -206,14 +206,7 @@ h3{font-size:clamp(1.5rem,2.2vw,2rem);line-height:1.05;margin-bottom:.35em}
 .photo img{width:100%;object-fit:cover;background:var(--granite-light)}
 .photo figcaption{font-family:var(--font-mono);font-size:.64rem;letter-spacing:.05em;text-transform:uppercase;color:var(--granite-deep);margin-top:.6rem;line-height:1.5}
 .photo figcaption a{color:inherit}
-.photo--placeholder{overflow:hidden;background:var(--lagoon)}
-.placeholder-art{width:100%;position:relative;display:flex;align-items:flex-end;padding:1rem;
-  background:
-    radial-gradient(ellipse 34% 24% at 24% 74%,var(--granite) 60%,transparent 61%),
-    radial-gradient(ellipse 24% 18% at 68% 80%,var(--granite) 60%,transparent 61%),
-    radial-gradient(ellipse 16% 12% at 48% 82%,#BCA49D 60%,transparent 61%),
-    linear-gradient(180deg,var(--lagoon) 0 58%,#A9CBD6 58% 70%,var(--sand) 70%)}
-.placeholder-art span{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ocean);background:rgba(250,247,242,.9);padding:.35em .6em;position:relative}
+.photo--empty div{background:var(--granite-light)}
 
 /* ---------- Home: island rows ---------- */
 .island-rows{list-style:none;padding:0;margin:0;border-top:1px solid rgba(14,59,87,.18)}
@@ -369,7 +362,6 @@ h3{font-size:clamp(1.5rem,2.2vw,2rem);line-height:1.05;margin-bottom:.35em}
 .badge--rough{background:var(--coral-light);color:var(--coral-deep)}
 .legend{display:flex;flex-wrap:wrap;gap:.5rem .9rem;align-items:center;font-size:.9rem;margin-top:1.5rem}
 .notice{border-left:2px solid var(--coral);padding:.4rem 0 .4rem 1.25rem;max-width:52em;margin-top:2rem}
-.placeholder-note{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;background:var(--amber-light);color:var(--ink);padding:.8rem 1rem;display:inline-block;line-height:1.5}
 .month-picker fieldset{border:0;padding:0;margin:0 0 1.25rem;display:grid;grid-template-columns:repeat(6,1fr);gap:0;border-top:1px solid rgba(14,59,87,.3);border-left:1px solid rgba(14,59,87,.3)}
 @media (min-width:760px){.month-picker fieldset{grid-template-columns:repeat(12,1fr)}}
 .chip{position:relative;border-right:1px solid rgba(14,59,87,.3);border-bottom:1px solid rgba(14,59,87,.3)}

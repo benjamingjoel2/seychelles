@@ -13,7 +13,7 @@ function staysPage() {
 ${pageHero({ eyebrow: 'Stays', slot: 'mahe', index: 3, label: 'Mahé', title: 'Where <em>to stay</em>', lede: 'Small places, mostly: family guesthouses, self-catering cottages and a few island lodges. We match the stay to the season and the coast as much as to the room.' })}
 <section class="section">
   <div class="wrap">
-    <p class="placeholder-note"><strong>Placeholder names.</strong> These are examples of the kinds of places we suggest, not real properties. Real partner stays will replace them.</p>
+    <p class="lede">We describe each stay by where it is and what it suits. We tell you the property by name when we plan your trip.</p>
     ${order.map((s) => html`<h2 class="group-h">${esc(name[s])}</h2>
       <ul class="cards cards--3">${stays.filter((x) => x.island === s).map((x) => html`<li class="card card--text">
         <div class="card-body"><p class="card-kicker">${esc(x.type)} · ${esc(x.size)}</p><h3>${esc(x.name)}</h3><p>${esc(x.fit)}</p></div>
