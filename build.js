@@ -79,6 +79,8 @@ function build() {
   if (missing.size) throw new Error(`No photo for: ${[...missing].join(', ')}. Add one to src/data/photos.js.`);
   const notLocal = [...used.values()].filter((p) => p.source === 'wikimedia' && !fs.existsSync(path.join(SRC, 'assets', 'photos', `${p.id}-640.webp`)));
   if (notLocal.length) throw new Error(`Wikimedia photos not downloaded: ${notLocal.map((p) => p.file).join(', ')}. Run npm run photos.`);
+  // Photo credits page (Creative Commons photos used above, with the pages they appear on).
+  pages.push(freshRequire(path.join(SRC, 'pages', 'credits.js'))(pages, used));
 
   for (const p of pages) {
     const file = p.path.endsWith('.html') ? path.join(DIST, p.path) : path.join(DIST, p.path, 'index.html');

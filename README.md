@@ -67,15 +67,16 @@ to `src/data/photos.js`, run `npm run photos` and commit the new files. Photos a
 sizes with `srcset` and lazy-loaded below the fold; the hero photo is preloaded. Unsplash and
 Pexels licences do not require attribution, so the site shows only the location in each caption.
 Photographer and source stay recorded in `src/data/photos.js`. If a Creative Commons photo is ever
-added, it must be credited (bring back a credits page for those photos only).
+added, it must be credited: it is listed on `/photo-credits/` automatically.
 
 **Rule:** only add a photo when the location on its Unsplash or Pexels page names the place
 it is used for. Copy that text into `location`; it is shown in the caption.
 Where Unsplash and Pexels have nothing for a place (Curieuse, Denis, Bird Island, Aldabra and
 some beaches), the photo comes from Wikimedia Commons (`W(...)` entries: CC0, public domain,
 CC BY or CC BY-SA, file title or description naming the place). `npm run photos` downloads and
-resizes those too (needs ImageMagick with WebP), and their caption carries the author and
-licence, as the licence requires. There are no drawings: a slot with no photo fails the build.
+resizes those too (needs ImageMagick with WebP). Their author, licence and source are listed on
+`/photo-credits/` (built by `src/pages/credits.js`, linked from the footer), as the licence requires;
+captions on the photos show the place only. There are no drawings: a slot with no photo fails the build.
 
 ### Facts
 
