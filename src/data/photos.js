@@ -8,7 +8,8 @@
  * Commons file title/description) names the place it is used for. `location` records that text
  * and is shown in the caption. Every slot the site renders must have a photo: there are no
  * drawings, and a slot left empty fails the build.
- * Images are self-hosted (scripts/fetch-photos.js) and credited in the caption.
+ * Images are self-hosted (scripts/fetch-photos.js). Captions show the place only; Wikimedia photos
+ * are credited (author, licence, source) on /photo-credits/, linked from the footer.
  */
 const P = (slot, id, page, img, photographer, handle, location, alt) => ({
   source: 'unsplash', slot, id, page, img: `https://images.unsplash.com/${img}`, photographer,
@@ -19,8 +20,8 @@ const X = (slot, id, page, img, photographer, photographer_url, location, alt) =
   source: 'pexels', slot, id, page, img, photographer, photographer_url, location, alt,
 });
 
-// Wikimedia Commons photos: `file` is the Commons file name (no "File:" prefix); the licence
-// requires the author and licence in the caption.
+// Wikimedia Commons photos: `file` is the Commons file name (no "File:" prefix). The licence
+// requires the author and licence to be credited: they are listed on /photo-credits/.
 const W = (slot, file, photographer, license, location, alt) => ({
   source: 'wikimedia', slot, id: `wm-${require('crypto').createHash('md5').update(file).digest('hex').slice(0, 10)}`,
   file, page: `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(file.replace(/ /g, '_'))}`,

@@ -34,7 +34,9 @@ const label = (text, n) => `<p class="label">${n != null ? `<span class="label-n
 const missing = { add: (x) => globalThis.__photoMissing && globalThis.__photoMissing.add(x) };
 
 /**
- * Responsive photo with credit. Only location-verified photos, never a photo of somewhere else.
+ * Responsive photo; the caption is the place name only. Photographer and licence credits are
+ * never shown on the photo: Creative Commons photos are credited on /photo-credits/ (src/pages/credits.js).
+ * Only location-verified photos, never a photo of somewhere else.
  */
 function photo(slot, { index = 0, ratio = '3:2', sizes = '100vw', eager = false, cls = '', label: lbl = '', caption = true } = {}) {
   const list = photos[slot] || [];
@@ -57,7 +59,7 @@ function photo(slot, { index = 0, ratio = '3:2', sizes = '100vw', eager = false,
     <img src="${fallback}" srcset="${srcset}" sizes="${sizes}"
       width="1200" height="${Math.round((1200 * rh) / rw)}" alt="${esc(p.alt)}"
       ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" style="aspect-ratio:${rw}/${rh}">
-    ${caption ? `<figcaption>${esc(p.location)}${p.source === 'wikimedia' ? ` · ${esc(p.photographer)} / Wikimedia Commons, ${esc(p.license)}` : ''}</figcaption>` : ''}
+    ${caption ? `<figcaption>${esc(p.location)}</figcaption>` : ''}
   </figure>`;
 }
 
@@ -158,7 +160,7 @@ ${body}
   <div class="wrap footer-row footer-row--small">
     <p>© ${new Date().getFullYear()} ${esc(config.brand.name)}</p>
     <p>${esc(c.address)}</p>
-    <ul><li><a href="/privacy/">Privacy policy</a></li><li><a href="/booking-terms/">Booking terms</a></li><li><a href="/cookies/">Cookie policy</a></li></ul>
+    <ul><li><a href="/privacy/">Privacy policy</a></li><li><a href="/booking-terms/">Booking terms</a></li><li><a href="/cookies/">Cookie policy</a></li><li><a href="/photo-credits/">Photo credits</a></li></ul>
   </div>
 </footer>
 ${data ? `<script id="page-data" type="application/json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>` : ''}

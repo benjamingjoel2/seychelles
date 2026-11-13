@@ -42,3 +42,14 @@ module.exports = (lang) => {
   });
   return out;
 };
+
+// Photo credits page (src/pages/credits.js): Wikimedia Commons place names, author names and
+// licence codes stay as they are in every language.
+const withCredits = module.exports;
+module.exports = (lang) => {
+  const out = withCredits(lang);
+  if (lang === 'en') return out;
+  const photos = Object.values(require('../src/data/photos.js')).flat().filter((p) => p.source === 'wikimedia');
+  for (const p of photos) for (const s of [p.location, p.photographer, p.license]) if (!/^public domain$/i.test(s)) out[s] = s;
+  return out;
+};
